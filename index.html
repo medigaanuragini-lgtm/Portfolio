@@ -773,7 +773,6 @@
           setTimeout(tick, 72 + Math.random() * 60);
         } else {
           startAmbient();
-          initIdleTimer();
           // Auto-advance after 2.5s if user hasn't clicked
           setTimeout(() => { if (!introComplete) earlySkip(); }, 2500);
         }
