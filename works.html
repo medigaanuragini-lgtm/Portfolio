@@ -859,13 +859,19 @@
     }
 
     /* ── Monitor modal ────────────────────────────────────────────────────── */
-    const modal       = document.getElementById('monitor-modal');
-    const monInner    = document.getElementById('monitor-inner');
-    const monTitle    = document.getElementById('monitor-title');
-    const monMeta     = document.getElementById('monitor-meta');
-    const monLink     = document.getElementById('monitor-link');
-    const monClose    = document.getElementById('monitor-close');
+    const modal          = document.getElementById('monitor-modal');
+    const monInner       = document.getElementById('monitor-inner');
+    const monTitle       = document.getElementById('monitor-title');
+    const monMeta        = document.getElementById('monitor-meta');
+    const monLink        = document.getElementById('monitor-link');
+    const monClose       = document.getElementById('monitor-close');
     const monPlaceholder = document.getElementById('monitor-placeholder');
+    const galleryPrev    = document.getElementById('gallery-prev');
+    const galleryNext    = document.getElementById('gallery-next');
+    const galleryCounter = document.getElementById('gallery-counter');
+
+    let galleryImages = [];
+    let galleryIdx    = 0;
 
     function getYTId(url) {
       const m = url && url.match(/(?:youtu\.be\/|v=|\/embed\/)([A-Za-z0-9_-]{11})/);
@@ -876,10 +882,30 @@
       return m ? m[1] : null;
     }
 
+    function showGalleryImage(idx) {
+      monInner.querySelectorAll('img').forEach(el => el.remove());
+      monPlaceholder.style.display = 'none';
+      const el = document.createElement('img');
+      el.src = galleryImages[idx];
+      el.style.maxWidth = '100%';
+      el.style.maxHeight = '72vh';
+      el.style.objectFit = 'contain';
+      monInner.insertBefore(el, galleryPrev);
+
+      galleryCounter.textContent = (idx + 1) + ' / ' + galleryImages.length;
+      galleryPrev.classList.toggle('hidden', idx === 0);
+      galleryNext.classList.toggle('hidden', idx === galleryImages.length - 1);
+    }
+
     function openMonitor(p) {
-      // Clear previous content
+      // Clear previous
       monInner.querySelectorAll('img, iframe').forEach(el => el.remove());
       monPlaceholder.style.display = '';
+      galleryImages = [];
+      galleryIdx = 0;
+      galleryCounter.classList.add('hidden');
+      galleryPrev.classList.add('hidden');
+      galleryNext.classList.add('hidden');
 
       monTitle.textContent = p.title.toUpperCase();
       monMeta.textContent  = p.year + '  ·  ' + p.format;
@@ -891,40 +917,53 @@
         monLink.classList.add('hidden');
       }
 
-      // Decide what to show: img > YouTube > Vimeo > placeholder
-      const ytId     = getYTId(p.link);
-      const vimeoId  = getVimeoId(p.link);
-
-      if (p.img) {
+      // Gallery takes priority, then single img, then YouTube, then Vimeo
+      if (p.gallery && p.gallery.length > 0) {
+        galleryImages = p.gallery;
+        galleryCounter.classList.remove('hidden');
+        showGalleryImage(0);
+      } else if (p.img) {
         monPlaceholder.style.display = 'none';
         const el = document.createElement('img');
         el.src = p.img;
-        monInner.insertBefore(el, monPlaceholder);
-      } else if (ytId) {
-        monPlaceholder.style.display = 'none';
-        const el = document.createElement('iframe');
-        el.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0';
-        el.allow = 'autoplay; fullscreen';
-        el.allowFullscreen = true;
-        monInner.insertBefore(el, monPlaceholder);
-      } else if (vimeoId) {
-        monPlaceholder.style.display = 'none';
-        const el = document.createElement('iframe');
-        el.src = 'https://player.vimeo.com/video/' + vimeoId + '?autoplay=1';
-        el.allow = 'autoplay; fullscreen';
-        el.allowFullscreen = true;
-        monInner.insertBefore(el, monPlaceholder);
+        el.style.maxWidth = '100%';
+        el.style.maxHeight = '72vh';
+        el.style.objectFit = 'contain';
+        monInner.insertBefore(el, galleryPrev);
+      } else {
+        const ytId    = getYTId(p.link);
+        const vimeoId = getVimeoId(p.link);
+        if (ytId) {
+          monPlaceholder.style.display = 'none';
+          const el = document.createElement('iframe');
+          el.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0';
+          el.allow = 'autoplay; fullscreen';
+          el.allowFullscreen = true;
+          monInner.insertBefore(el, galleryPrev);
+        } else if (vimeoId) {
+          monPlaceholder.style.display = 'none';
+          const el = document.createElement('iframe');
+          el.src = 'https://player.vimeo.com/video/' + vimeoId + '?autoplay=1';
+          el.allow = 'autoplay; fullscreen';
+          el.allowFullscreen = true;
+          monInner.insertBefore(el, galleryPrev);
+        }
       }
-      // else: keep placeholder
 
       modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
     }
+
+    galleryPrev.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (galleryIdx > 0) { galleryIdx--; showGalleryImage(galleryIdx); }
+    });
+    galleryNext.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (galleryIdx < galleryImages.length - 1) { galleryIdx++; showGalleryImage(galleryIdx); }
+    });
 
     function closeMonitor() {
       modal.classList.remove('open');
-      document.body.style.overflow = '';
-      // Stop video by removing iframes
       monInner.querySelectorAll('iframe').forEach(el => el.remove());
     }
 
@@ -933,7 +972,10 @@
       if (e.target === modal) closeMonitor();
     });
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && modal.classList.contains('open')) closeMonitor();
+      if (!modal.classList.contains('open')) return;
+      if (e.key === 'Escape') { closeMonitor(); }
+      else if (e.key === 'ArrowLeft'  && galleryImages.length) { galleryPrev.click(); }
+      else if (e.key === 'ArrowRight' && galleryImages.length) { galleryNext.click(); }
     });
 
     /* ── Filter buttons ───────────────────────────────────────────────────── */
