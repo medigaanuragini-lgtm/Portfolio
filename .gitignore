@@ -1,0 +1,9 @@
+.DS_Store
+.claude/
+serve.py
+
+# Large video files (too big for GitHub — host on Vimeo/Drive)
+*.mp4
+*.mov
+*.MOV
+*.MP4

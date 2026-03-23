@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — Anuragini Mediga</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    a { text-decoration: none; color: inherit; }
+
+    html, body {
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      background: #000;
+      font-family: 'Share Tech Mono', monospace;
+      color: #e8e0d0;
+    }
+
+    /* ── FLASH ── */
+    #flash {
+      position: fixed; inset: 0; z-index: 9000;
+      background: #000; pointer-events: none;
+      transition: opacity 0.55s ease;
+    }
+    #flash.gone { opacity: 0; }
+
+    /* ── FULL-BLEED BACKGROUND ── */
+    #bg {
+      position: fixed; inset: 0; z-index: 0;
+      background: url('CONTACT PAGE/Contact Page.jpg') center center / cover no-repeat;
+    }
+
+    /* ── FILM GRAIN ── */
+    .grain {
+      position: fixed; inset: 0; z-index: 6000; pointer-events: none;
+      opacity: 0.06;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px; mix-blend-mode: screen;
+      animation: grain-shift 0.18s steps(1) infinite;
+    }
+    @keyframes grain-shift {
+      0%   { background-position:   0px   0px; }
+      20%  { background-position: -42px -28px; }
+      40%  { background-position:  26px  38px; }
+      60%  { background-position: -18px  52px; }
+      80%  { background-position:  44px -16px; }
+      100% { background-position: -30px  24px; }
+    }
+
+    /* ── ● REC ── */
+    #rec-ind {
+      position: fixed; top: 18px; left: 22px; z-index: 7000;
+      display: flex; align-items: center; gap: 7px;
+      font-family: 'VT323', monospace;
+      font-size: 1.1rem; letter-spacing: 0.14em;
+      color: rgba(210,50,50,0.85);
+      pointer-events: none;
+    }
+    #rec-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #cc3030;
+      animation: rec-blink 1.3s ease-in-out infinite;
+    }
+    @keyframes rec-blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
+
+    /* ── NAME — top right ── */
+    #name-hud {
+      position: fixed; top: 18px; right: 22px; z-index: 7000;
+      text-align: right; pointer-events: none;
+    }
+    #name-hud .n-name {
+      font-family: 'VT323', monospace;
+      font-size: clamp(1.1rem, 1.8vw, 1.7rem);
+      letter-spacing: 0.3em; color: rgba(232,224,208,0.7); line-height: 1;
+    }
+    #name-hud .n-role {
+      font-size: clamp(0.28rem, 0.48vw, 0.4rem);
+      letter-spacing: 0.38em; color: rgba(232,224,208,0.28); margin-top: 4px;
+    }
+
+    /* ── PAGE HEADING ── */
+    #page-heading {
+      position: fixed;
+      top: 56px;        /* pulled down from page top */
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 7000;
+      text-align: center;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    #page-heading span {
+      font-family: 'VT323', monospace;
+      font-size: clamp(1.4rem, 2.4vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: rgba(232,224,208,0.82);
+      text-shadow:
+        0 0 20px rgba(232,224,208,0.18),
+        0 1px 4px rgba(0,0,0,0.9);
+    }
+
+    /* ═══════════════════════════════════════
+       THREE CARD ZONES
+       JS positions each zone to match the
+       exact card face boundaries in the photo.
+    ══════════════════════════════════════ */
+    #zones {
+      position: fixed; inset: 0; z-index: 1000;
+    }
+
+    .cz {
+      position: absolute;
+      cursor: pointer;
+      /* JS sets: left, top, width, height */
+    }
+
+    /* ── DARK OVERLAY — appears on hover ── */
+    .card-ovl {
+      position: absolute; inset: 0;
+      background: transparent;
+      transition: background 0.38s ease;
+      pointer-events: none;
+    }
+    .cz:hover .card-ovl {
+      background: rgba(0, 0, 0, 0.68);
+    }
+
+    /* ── REVEALED CONTENT ── */
+    .card-reveal {
+      position: absolute;
+      /* JS sets --card-center-pct dynamically from the real image.
+         Fallback of 58% covers most viewports. */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) translateY(10px);
+      z-index: 15;
+      display: flex; flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(8px, 1.2vw, 16px);
+      text-align: center;
+      width: 86%;
+      opacity: 0;
+      transition: opacity 0.38s ease 0.06s, transform 0.38s ease 0.06s;
+      pointer-events: none;
+    }
+    .cz:hover .card-reveal {
+      opacity: 1;
+      transform: translate(-50%, -50%) translateY(0);
+      pointer-events: all;
+    }
+
+    /* Logo — bigger */
+    .reveal-logo {
+      height: clamp(48px, 7.5vw, 76px);
+      width: auto;
+      display: block;
+      filter: drop-shadow(0 0 16px rgba(255,255,255,0.22));
+      transition: filter 0.25s, transform 0.25s;
+    }
+    .card-reveal:hover .reveal-logo {
+      filter: drop-shadow(0 0 28px rgba(255,255,255,0.48));
+      transform: scale(1.07);
+    }
+
+    /* Big bold tagline */
+    .reveal-tagline {
+      font-family: 'VT323', monospace;
+      font-size: clamp(1.5rem, 2.6vw, 2.6rem);
+      letter-spacing: 0.05em;
+      line-height: 1.12;
+      color: #fff;
+      text-shadow:
+        0 0 16px rgba(255,245,155,1),
+        0 0 42px rgba(235,195,55,0.65),
+        0 2px 6px rgba(0,0,0,1);
+    }
+
+    /* ── VCR FOOTER ── */
+    #vcr-footer {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 8000;
+      display: flex; align-items: center; justify-content: center;
+      gap: clamp(28px, 8vw, 76px);
+      padding: 9px 60px 12px;
+      background: rgba(0,0,0,0.92);
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    #vcr-footer a {
+      font-family: 'VT323', monospace;
+      font-size: clamp(1.8rem, 3.4vw, 2.8rem);
+      letter-spacing: 0.14em;
+      color: rgba(210,205,185,0.52);
+      text-shadow: -1px 0 rgba(255,40,40,0.28), 1px 0 rgba(40,220,255,0.28);
+      transition: color 0.15s, text-shadow 0.15s, transform 0.15s;
+      padding: 2px 4px; display: inline-block;
+    }
+    #vcr-footer a:hover {
+      color: #fff;
+      text-shadow:
+        -3px 0 rgba(255,40,40,0.85), 3px 0 rgba(40,220,255,0.85),
+        0 0 20px rgba(255,245,200,0.9), 0 0 46px rgba(220,200,120,0.5);
+      transform: scale(1.09);
+    }
+    #vcr-footer a:active { transform: scale(0.96); }
+
+    /* ── TIMECODE ── */
+    #timecode {
+      position: fixed; bottom: 15px; right: 22px; z-index: 7000;
+      font-family: 'VT323', monospace; font-size: 0.9rem; letter-spacing: 0.15em;
+      color: rgba(210,205,175,0.28); pointer-events: none;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      #cz1 { left: 3%; width: 29%; }
+      #cz2 { left: 34%; width: 31%; }
+      #cz3 { left: 67%; width: 28%; }
+      .cz:hover .card-reveal { opacity: 1; transform: translate(-50%,-50%) translateY(0); }
+      .reveal-tagline { font-size: clamp(0.85rem, 4.5vw, 1.4rem); }
+      .reveal-logo { height: 38px; }
+      #vcr-footer { padding: 7px 16px 10px; gap: 16px; }
+      #timecode { display: none; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <div id="flash"></div>
+  <div id="bg"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ● REC -->
+  <div id="rec-ind"><div id="rec-dot"></div>REC</div>
+
+  <!-- PAGE HEADING — centered top -->
+  <div id="page-heading">
+    <span>HOVER THE CARDS. GET THE DETAILS.</span>
+  </div>
+
+  <!-- NAME -->
+  <div id="name-hud">
+    <div class="n-name">ANURAGINI MEDIGA</div>
+    <div class="n-role">CREATIVE PRODUCER · VIDEO ARTIST · FILMMAKER</div>
+  </div>
+
+  <span id="timecode">00:00:00:00</span>
+
+  <!-- THREE CARD ZONES -->
+  <div id="zones">
+
+    <!-- CARD 1 — Gmail -->
+    <div class="cz" id="cz1">
+      <div class="card-ovl"></div>
+      <a class="card-reveal" href="mailto:medigaanuragini@gmail.com">
+        <img src="Gmail_logo.png" class="reveal-logo" alt="Gmail">
+        <div class="reveal-tagline">YES I RESPOND.<br>USUALLY FAST.</div>
+      </a>
+    </div>
+
+    <!-- CARD 2 — LinkedIn -->
+    <div class="cz" id="cz2">
+      <div class="card-ovl"></div>
+      <a class="card-reveal" href="https://www.linkedin.com/in/anuragini-m-786a1b19a/" target="_blank" rel="noopener">
+        <img src="LinkedIn_Logo.png" class="reveal-logo" alt="LinkedIn">
+        <div class="reveal-tagline">WHERE I PRETEND<br>TO BE CORPORATE.</div>
+      </a>
+    </div>
+
+    <!-- CARD 3 — Instagram -->
+    <div class="cz" id="cz3">
+      <div class="card-ovl"></div>
+      <a class="card-reveal" href="https://www.instagram.com/anuragini22/" target="_blank" rel="noopener">
+        <img src="Instagram_Logo.png" class="reveal-logo" alt="Instagram">
+        <div class="reveal-tagline">WHERE THE<br>REAL WORK LIVES.</div>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- VCR FOOTER -->
+  <nav id="vcr-footer">
+    <a href="index.html">○ HOME</a>
+    <a href="about.html">◄◄ ABOUT</a>
+    <a href="works.html">►► WORKS</a>
+  </nav>
+
+  <script>
+  (() => {
+    'use strict';
+
+    /* FLASH */
+    const flash = document.getElementById('flash');
+    setTimeout(() => flash.classList.add('gone'), 80);
+
+    /* TIMECODE */
+    const tc = document.getElementById('timecode');
+    const t0 = Date.now();
+    (function tick() {
+      const ms = Date.now() - t0;
+      const fr = Math.floor((ms % 1000) / 33.33) % 30;
+      const s  = Math.floor(ms / 1000) % 60;
+      const m  = Math.floor(ms / 60000) % 60;
+      const h  = Math.floor(ms / 3600000);
+      tc.textContent =
+        String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' +
+        String(s).padStart(2,'0') + ':' + String(fr).padStart(2,'0');
+      requestAnimationFrame(tick);
+    })();
+
+    /* ═══════════════════════════════════════════════════════
+       PRECISE CARD ZONE POSITIONING
+       Image: 1920×1080 (16:9). Cover always scales by height
+       (oy = 0). We map each card's face boundaries (in image
+       pixel fractions) to exact viewport pixel coords, then
+       set left/top/width/height on each .cz zone so
+       top:50% left:50% on .card-reveal hits dead center.
+
+       Tune by adjusting the lx/rx/ty/by values below.
+    ═══════════════════════════════════════════════════════ */
+    const IMG = { w: 1920, h: 1080 };
+
+    // Card face bounds as fraction of image (lx=left, rx=right, ty=top, by=bottom)
+    // Adjust these if the zones don't align after inspecting the page.
+    const CARD_BOUNDS = [
+      { lx: 0.060, rx: 0.327, ty: 0.048, by: 0.949 },  // Card 1 – black  (perfect)
+      { lx: 0.343, rx: 0.665, ty: 0.044, by: 0.955 },  // Card 2 – gray   (shifted left 0.010)
+      { lx: 0.689, rx: 0.960, ty: 0.048, by: 0.949 },  // Card 3 – blue   (shifted right 0.020)
+    ];
+
+    function positionZones() {
+      const vw = window.innerWidth, vh = window.innerHeight;
+      // Cover scale: image fills whichever viewport dimension requires more scaling
+      const scale = Math.max(vw / IMG.w, vh / IMG.h);
+      // Offsets (may be negative → image extends beyond viewport)
+      const ox = (vw - IMG.w * scale) / 2;
+      const oy = (vh - IMG.h * scale) / 2;
+
+      document.querySelectorAll('.cz').forEach((zone, i) => {
+        const b = CARD_BOUNDS[i];
+        // Convert image fractions → viewport pixels
+        const lPx = IMG.w * b.lx * scale + ox;
+        const rPx = IMG.w * b.rx * scale + ox;
+        const tPx = IMG.h * b.ty * scale + oy;
+        const bPx = IMG.h * b.by * scale + oy;
+        // Clamp to viewport
+        const cl = Math.max(0, lPx);
+        const cr = Math.min(vw, rPx);
+        const ct = Math.max(0, tPx);
+        const cb = Math.min(vh, bPx);
+
+        zone.style.left   = cl.toFixed(1) + 'px';
+        zone.style.top    = ct.toFixed(1) + 'px';
+        zone.style.width  = (cr - cl).toFixed(1) + 'px';
+        zone.style.height = (cb - ct).toFixed(1) + 'px';
+      });
+    }
+
+    positionZones();
+    window.addEventListener('resize', positionZones);
+
+    /* NAVIGATION WITH FLASH */
+    function navigateTo(href) {
+      flash.style.transition = 'opacity 0.4s ease';
+      flash.style.opacity = '1';
+      setTimeout(() => { window.location.href = href; }, 440);
+    }
+    document.querySelectorAll('a[href]').forEach(el => {
+      const h = el.getAttribute('href');
+      if (!h || h.startsWith('http') || h.startsWith('mailto') || h === '#') return;
+      el.addEventListener('click', e => { e.preventDefault(); navigateTo(h); });
+    });
+
+  })();
+  </script>
+
+</body>
+</html>

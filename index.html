@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anuragini Mediga</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #000;
+      width: 100vw; height: 100vh;
+      overflow: hidden; cursor: default;
+    }
+
+    /* ── CRT SCREEN ── */
+    #screen {
+      position: fixed; inset: 0;
+      background: #07070500;
+      overflow: hidden;
+      will-change: transform;
+      transform-origin: center center;
+      transform-style: preserve-3d;
+    }
+
+    /* Scanlines */
+    #scanlines {
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px, transparent 2px,
+        rgba(0,0,0,0.17) 2px, rgba(0,0,0,0.17) 3px
+      );
+      animation: scan-drift 10s linear infinite;
+      pointer-events: none; z-index: 50; opacity: 0;
+    }
+    @keyframes scan-drift {
+      0%   { background-position: 0 0; }
+      100% { background-position: 0 3px; }
+    }
+
+    /* CRT vignette */
+    #vignette {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center,
+        transparent 48%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0.93) 100%
+      );
+      pointer-events: none; z-index: 51;
+    }
+
+    /* Noise canvas */
+    #noise {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 48;
+      opacity: 0; image-rendering: pixelated;
+    }
+
+    /* Tracking bands */
+    #bands { position: absolute; inset: 0; pointer-events: none; z-index: 49; overflow: hidden; }
+
+    /* ── POWER LINE ── */
+    #pline {
+      position: absolute; left: 0; right: 0;
+      top: 50%; transform: translateY(-50%);
+      height: 2px;
+      background: #d8d4c0;
+      box-shadow: 0 0 14px 6px rgba(210,205,180,0.85), 0 0 35px 12px rgba(150,148,130,0.35);
+      opacity: 0; z-index: 60;
+    }
+
+    /* ── CONTENT ── */
+    #content {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 40; gap: 44px;
+    }
+
+    /* PRESS PLAY */
+    #prompt {
+      font-family: 'VT323', monospace;
+      font-size: clamp(3.5rem, 9vw, 7.5rem);
+      color: #d8d4bc; letter-spacing: 0.18em;
+      text-align: center; line-height: 1;
+      text-shadow:
+        -3px 0 rgba(255,40,40,0.65),
+         3px 0 rgba(40,220,255,0.65),
+         0 0 28px rgba(200,198,170,0.3);
+      opacity: 0; transition: opacity 0.25s ease;
+      user-select: none; pointer-events: none;
+    }
+    @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+    .cur { display: inline-block; animation: blink 0.75s step-start infinite; }
+
+    /* ── VHS LABEL ── */
+    #label-wrap {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 36px; z-index: 40;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.55s ease;
+      perspective: 1200px;
+    }
+    #label-wrap.show { opacity: 1; pointer-events: all; }
+
+    #vhs-label {
+      font-family: 'Share Tech Mono', monospace;
+      background: #ede7d1;
+      color: #141210;
+      width: min(1100px, 96vw);
+      box-shadow: 8px 14px 40px rgba(0,0,0,0.85), 0 0 80px rgba(0,0,0,0.5);
+      position: relative; overflow: hidden;
+      filter: contrast(1.07) saturate(0.8) brightness(0.96);
+      cursor: default;
+      transform-origin: center center;
+      will-change: auto;
+    }
+    /* Paper texture lines */
+    #vhs-label::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px, transparent 5px,
+        rgba(0,0,0,0.02) 5px, rgba(0,0,0,0.02) 6px
+      );
+      pointer-events: none; z-index: 2;
+    }
+
+    .lbl-stripe {
+      height: 68px; background: #7a1515;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 0 28px; position: relative; z-index: 1;
+    }
+    .lbl-stripe-l { font-size: 1.25rem; letter-spacing: 0.35em; color: rgba(255,255,255,0.92); font-weight: 700; }
+    .lbl-stripe-r { font-size: 0.82rem; letter-spacing: 0.3em; color: rgba(255,255,255,0.52); }
+
+    /* Instagram handle link */
+    .lbl-ig-link {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.05rem; letter-spacing: 0.35em; font-weight: 700;
+      color: rgba(255,255,255,0.82);
+      text-decoration: none;
+      position: relative;
+      transition: color 0.2s, text-shadow 0.2s;
+      cursor: pointer;
+    }
+    .lbl-ig-link:hover {
+      color: #fff;
+      text-shadow: 0 0 12px rgba(255,255,255,0.9), 0 0 28px rgba(255,180,80,0.6);
+    }
+    .lbl-resume-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem; letter-spacing: 0.35em;
+      color: rgba(255,255,255,0.82);
+      border: 1px solid rgba(255,255,255,0.42);
+      padding: 3px 13px; background: rgba(255,255,255,0.07);
+      text-decoration: none; display: inline-block;
+      transition: background 0.18s, border-color 0.18s, color 0.18s, box-shadow 0.18s;
+      cursor: pointer;
+    }
+    .lbl-resume-btn:hover {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.9);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(255,255,255,0.25);
+    }
+
+    .lbl-body {
+      padding: 26px 38px 30px;
+      font-size: clamp(1.1rem, 1.9vw, 1.35rem);
+      line-height: 1.7; position: relative; z-index: 1;
+    }
+
+    .lbl-title {
+      font-size: clamp(3rem, 6vw, 5rem);
+      letter-spacing: 0.04em; font-weight: 700;
+      margin-bottom: 5px; line-height: 1.0;
+      transition: text-shadow 0.2s ease;
+    }
+    #vhs-label:hover .lbl-title {
+      text-shadow: -2px 0 rgba(255,30,30,0.45), 2px 0 rgba(30,200,255,0.45);
+    }
+    .lbl-role  { opacity: 0.58; font-size: 1.0em; margin-bottom: 5px; letter-spacing: 0.05em; }
+    .lbl-line  { margin-bottom: 16px; font-size: 1.05em; opacity: 0.85; letter-spacing: 0.03em; }
+    .lbl-quirk {
+      font-size: 0.82em; letter-spacing: 0.04em;
+      color: rgba(20,18,16,0.48); font-style: italic;
+      margin-bottom: 14px; margin-top: 2px;
+    }
+    .lbl-rule  { border: none; border-top: 1px solid rgba(0,0,0,0.2); margin: 14px 0; }
+    .lbl-row   { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 1.0em; }
+    .lbl-key   { opacity: 0.5; flex-shrink: 0; margin-right: 12px; }
+    .lbl-avail { color: #1a5c1a; font-weight: bold; letter-spacing: 0.04em; }
+    .lbl-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+    .lbl-hint {
+      font-size: 0.55rem; letter-spacing: 0.3em;
+      color: rgba(20,18,16,0.28); text-align: right;
+      margin-top: 8px; font-style: italic;
+    }
+
+    /* ── VCR NAV ── */
+    #vcr-nav {
+      display: flex; align-items: center; gap: clamp(24px, 7vw, 64px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease 0.4s;
+    }
+    #vcr-nav.show { opacity: 1; pointer-events: all; }
+
+    .vcr-btn {
+      font-family: 'VT323', monospace;
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      letter-spacing: 0.12em;
+      color: rgba(210,205,185,0.7);
+      background: none; border: none; cursor: pointer;
+      text-shadow: -1px 0 rgba(255,40,40,0.35), 1px 0 rgba(40,220,255,0.35);
+      transition: color 0.15s, text-shadow 0.15s, transform 0.15s;
+      padding: 4px 2px; user-select: none;
+      pointer-events: all;
+    }
+    .vcr-btn:hover {
+      color: #fff;
+      text-shadow:
+        -3px 0 rgba(255,40,40,0.85),
+         3px 0 rgba(40,220,255,0.85),
+         0 0 18px rgba(255,245,200,0.85),
+         0 0 40px rgba(220,200,120,0.45);
+      transform: scale(1.1);
+    }
+    .vcr-btn:active { transform: scale(0.96); }
+
+    /* ── HUD CORNERS ── */
+    #hud-br {
+      position: fixed; bottom: 22px; right: 26px;
+      font-family: 'VT323', monospace;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+      z-index: 60; opacity: 0; transition: opacity 0.6s ease;
+    }
+    #timecode {
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      color: rgba(210,205,175,0.52);
+      letter-spacing: 0.15em;
+      text-shadow: 0 0 8px rgba(190,188,155,0.25);
+    }
+
+    #hud-tl {
+      position: fixed; top: 22px; left: 26px;
+      font-family: 'VT323', monospace;
+      display: flex; flex-direction: column; gap: 6px;
+      z-index: 60; opacity: 0; transition: opacity 0.6s ease;
+    }
+    #rec-ind {
+      font-size: 1.1rem; letter-spacing: 0.14em;
+      color: rgba(210,50,50,0.85);
+      display: flex; align-items: center; gap: 7px;
+    }
+    #rec-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #cc3030;
+      animation: rec-blink 1.3s ease-in-out infinite;
+    }
+    @keyframes rec-blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
+    #channel { font-size: 0.88rem; letter-spacing: 0.2em; color: rgba(210,205,175,0.38); }
+
+    /* Bottom-left HUD */
+    #hud-bl {
+      position: fixed; bottom: 22px; left: 26px;
+      font-family: 'VT323', monospace;
+      display: flex; flex-direction: column; gap: 6px;
+      z-index: 60;
+    }
+    #tracking-btn {
+      position: static; font-family: 'VT323', monospace;
+      font-size: clamp(0.85rem, 1.8vw, 1.1rem);
+      letter-spacing: 0.18em; color: rgba(210,205,175,0.35);
+      background: none; border: none; cursor: pointer;
+      z-index: 60; opacity: 0;
+      transition: color 0.2s, opacity 0.6s ease;
+      padding: 0; text-align: left; user-select: none;
+    }
+    #tracking-btn:hover  { color: rgba(210,205,175,0.7); }
+    #tracking-btn.active { color: rgba(255,140,40,0.85); }
+
+    #snd-btn {
+      font-family: 'VT323', monospace;
+      font-size: clamp(0.85rem, 1.8vw, 1.1rem);
+      letter-spacing: 0.18em; color: rgba(210,205,175,0.35);
+      background: none; border: none; cursor: pointer;
+      z-index: 60; opacity: 0;
+      transition: color 0.2s, opacity 0.6s ease;
+      padding: 0; text-align: left; user-select: none;
+    }
+    #snd-btn:hover  { color: rgba(210,205,175,0.7); }
+    #snd-btn.on     { color: rgba(140,210,140,0.75); }
+
+    /* ── GLITCH / EXIT OVERLAYS ── */
+    #flash { position: fixed; inset: 0; background: #000; opacity: 0; pointer-events: none; z-index: 800; }
+    #nosig {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 700; opacity: 0; pointer-events: none;
+      transition: opacity 0.05s;
+    }
+    #nosig-txt {
+      font-family: 'VT323', monospace;
+      font-size: clamp(2rem, 8vw, 5rem);
+      background: #1c44bb; color: #fff;
+      padding: 6px 28px; letter-spacing: 0.18em;
+    }
+
+    /* ── SCREENSAVER ── */
+    #screensaver {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0); pointer-events: none;
+      transition: background 1.5s ease;
+      display: none;
+    }
+    #screensaver.active {
+      display: block; background: rgba(0,0,0,0.88);
+      pointer-events: all; cursor: pointer;
+    }
+    #ss-logo {
+      position: absolute;
+      font-family: 'VT323', monospace;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      color: rgba(180,160,55,0.65);
+      letter-spacing: 0.3em; white-space: nowrap;
+      text-shadow:
+        -2px 0 rgba(255,30,30,0.4),
+         2px 0 rgba(30,200,255,0.4),
+         0   0 24px rgba(180,160,55,0.3);
+      user-select: none; pointer-events: none;
+    }
+    #ss-msg {
+      position: absolute; bottom: 10%; left: 50%;
+      transform: translateX(-50%);
+      font-family: 'VT323', monospace;
+      font-size: clamp(0.9rem, 2vw, 1.3rem);
+      color: rgba(210,205,175,0.28);
+      letter-spacing: 0.38em; white-space: nowrap;
+      animation: blink 1.6s step-start infinite;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div id="screen">
+    <canvas id="noise"></canvas>
+    <div id="bands"></div>
+    <div id="scanlines"></div>
+    <div id="vignette"></div>
+    <div id="pline"></div>
+
+    <div id="content">
+      <div id="prompt"></div>
+    </div>
+
+    <div id="label-wrap">
+      <div id="vhs-label">
+        <div class="lbl-stripe">
+          <a class="lbl-ig-link" href="https://www.instagram.com/anuragini22/" target="_blank" rel="noopener">@ANURAGINI22</a>
+          <a class="lbl-resume-btn" href="resume.pdf" target="_blank" rel="noopener">▶ RESUME</a>
+        </div>
+        <div class="lbl-body">
+          <div class="lbl-title">▶▶ ANURAGINI MEDIGA</div>
+          <div class="lbl-role">Turning ideas into visually compelling content</div>
+          <div class="lbl-line">CREATIVE MEDIA PRODUCER · VIDEO EDITOR · FILMMAKER &amp; Everything in between</div>
+          <hr class="lbl-rule">
+          <div class="lbl-row"><span class="lbl-key">CONTAINS:</span><span>Ads · Docs · Podcasts · Films · Branding · Photo & More</span></div>
+          <div class="lbl-row"><span class="lbl-key">FORMAT:</span><span>4K · COLOUR GRADED · STEREO</span></div>
+          <hr class="lbl-rule">
+          <div class="lbl-stat-grid">
+            <div class="lbl-row"><span class="lbl-key">PROJECTS:</span><span>50+</span></div>
+            <div class="lbl-row"><span class="lbl-key">YEARS EXP:</span><span>7+</span></div>
+            <div class="lbl-row"><span class="lbl-key">CLIENTS:</span><span>40+</span></div>
+            <div class="lbl-row"><span class="lbl-key">VOL.:</span><span>01</span></div>
+          </div>
+          <hr class="lbl-rule">
+          <div class="lbl-row"><span class="lbl-key">TAPE DATE:</span><span>2018 — PRESENT</span></div>
+          <div class="lbl-row"><span class="lbl-key">STATUS:</span><span class="lbl-avail">● AVAILABLE FOR PROJECTS</span></div>
+        </div>
+      </div>
+
+      <div id="vcr-nav">
+        <button class="vcr-btn" data-href="about.html">◀◀ ABOUT</button>
+        <button class="vcr-btn" data-href="works.html">▶▶ WORKS</button>
+        <button class="vcr-btn" data-href="contact.html">CONTACT ■</button>
+      </div>
+    </div>
+
+  </div><!-- /#screen -->
+
+  <!-- HUD -->
+  <div id="hud-tl">
+    <div id="rec-ind"><div id="rec-dot"></div>REC</div>
+    <div id="channel">CH 01</div>
+  </div>
+  <div id="hud-br">
+    <div id="timecode">00:00:00</div>
+  </div>
+  <div id="hud-bl">
+    <button id="tracking-btn">TRACKING ◉</button>
+    <button id="snd-btn">SND ○</button>
+  </div>
+
+  <!-- Overlays -->
+  <div id="flash"></div>
+  <div id="nosig"><div id="nosig-txt">NO SIGNAL</div></div>
+
+  <!-- Screensaver -->
+  <div id="screensaver">
+    <div id="ss-logo">HELLO?</div>
+    <div id="ss-msg">CLICK ANYWHERE TO RESUME</div>
+  </div>
+
+  <script>
+  (() => {
+    'use strict';
+
+    /* ── NOISE CANVAS ── */
+    const noiseEl = document.getElementById('noise');
+    const nCtx    = noiseEl.getContext('2d');
+    noiseEl.width = 320; noiseEl.height = 180;
+    let noiseRafId = null;
+    function drawNoise() {
+      const w = noiseEl.width, h = noiseEl.height;
+      const img = nCtx.createImageData(w, h);
+      const d   = img.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const v = Math.random() * 255 | 0;
+        const a = Math.random() < 0.27 ? (140 + Math.random() * 115 | 0) : 0;
+        d[i]=v; d[i+1]=v; d[i+2]=v; d[i+3]=a;
+      }
+      nCtx.putImageData(img, 0, 0);
+    }
+    function runNoise()    { drawNoise(); noiseRafId = requestAnimationFrame(runNoise); }
+    function setNoise(amp) {
+      noiseEl.style.opacity = amp;
+      if (amp > 0 && !noiseRafId) runNoise();
+      if (amp <= 0 && noiseRafId) { cancelAnimationFrame(noiseRafId); noiseRafId = null; nCtx.clearRect(0,0,320,180); }
+    }
+
+    /* ── BANDS ── */
+    const bandsEl = document.getElementById('bands');
+    function addBand(y, h, op, dx, color) {
+      const d = document.createElement('div');
+      d.style.cssText = `position:absolute;left:0;right:0;top:${y}px;height:${h}px;
+        background:${color||`rgba(255,255,255,${op})`};transform:translateX(${dx}px);pointer-events:none;`;
+      bandsEl.appendChild(d); return d;
+    }
+    function clearBands() { bandsEl.innerHTML = ''; }
+
+    /* ── DOM REFS ── */
+    const scanlinesEl  = document.getElementById('scanlines');
+    const pline        = document.getElementById('pline');
+    const promptEl     = document.getElementById('prompt');
+    const labelWrap    = document.getElementById('label-wrap');
+    const vcrNav       = document.getElementById('vcr-nav');
+    const timecodeEl   = document.getElementById('timecode');
+    const hudBR        = document.getElementById('hud-br');
+    const hudTL        = document.getElementById('hud-tl');
+    const trackingBtn  = document.getElementById('tracking-btn');
+    const sndBtn       = document.getElementById('snd-btn');
+    const flashEl      = document.getElementById('flash');
+    const nosigEl      = document.getElementById('nosig');
+    const screenEl     = document.getElementById('screen');
+    const vhsLabel     = document.getElementById('vhs-label');
+    const screensaver  = document.getElementById('screensaver');
+    const ssLogo       = document.getElementById('ss-logo');
+
+    /* ══════════════════════════════════
+       AUDIO ENGINE — Web Audio API, no files
+    ══════════════════════════════════ */
+    let audioCtx   = null;
+    let masterGain = null;
+    let audioOn    = false;
+
+    function initAudio() {
+      if (audioCtx) return;
+      audioCtx   = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 1;
+      masterGain.connect(audioCtx.destination);
+    }
+
+    function makeNoiseBuffer(sec) {
+      const len  = audioCtx.sampleRate * sec;
+      const buf  = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+      return buf;
+    }
+
+    /* Warm welcome chord — plays when label appears */
+    function playWelcomeChord() {
+      if (!audioCtx || !audioOn) return;
+      const now = audioCtx.currentTime;
+      // Soft C major: root, maj3, 5th, octave — sine waves, very gentle
+      const freqs   = [261.63, 329.63, 392.00, 523.25];
+      const vols    = [0.048,  0.038,  0.034,  0.024];
+      const decays  = [3.5,    3.2,    3.0,    2.8];
+      freqs.forEach((freq, i) => {
+        const osc  = audioCtx.createOscillator();
+        osc.type   = 'sine';
+        osc.frequency.value = freq;
+        // Slight vibrato
+        const vibOsc  = audioCtx.createOscillator();
+        vibOsc.type   = 'sine';
+        vibOsc.frequency.value = 5.2;
+        const vibGain = audioCtx.createGain();
+        vibGain.gain.value = 1.5;
+        vibOsc.connect(vibGain);
+        vibGain.connect(osc.frequency);
+        vibOsc.start(now + 0.3);
+        vibOsc.stop(now + decays[i]);
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(vols[i], now + 0.18 + i * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + decays[i]);
+        osc.connect(gain); gain.connect(masterGain);
+        osc.start(now); osc.stop(now + decays[i] + 0.1);
+      });
+    }
+
+    /* Power hum — CRT warm-up */
+    function playPowerHum() {
+      if (!audioCtx || !audioOn) return;
+      const now = audioCtx.currentTime;
+      [60, 120, 180].forEach((freq, i) => {
+        const osc  = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type   = 'sine'; osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.04 / (i + 1), now + 0.3);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.4);
+        osc.connect(gain); gain.connect(masterGain);
+        osc.start(now); osc.stop(now + 1.5);
+      });
+    }
+
+    /* Static crackle — glitch events */
+    function playCrackle(duration = 0.35, vol = 0.28) {
+      if (!audioCtx || !audioOn) return;
+      const len  = audioCtx.sampleRate * duration;
+      const buf  = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < len; i++)
+        data[i] = Math.random() < 0.06 ? (Math.random() * 2 - 1) * 2.5 : (Math.random() * 2 - 1) * 0.08;
+      const src  = audioCtx.createBufferSource();
+      src.buffer = buf;
+      const gain = audioCtx.createGain();
+      const now  = audioCtx.currentTime;
+      gain.gain.setValueAtTime(vol, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+      src.connect(gain); gain.connect(masterGain);
+      src.start();
+    }
+
+    /* VCR servo click — nav hover */
+    function playVcrClick() {
+      if (!audioCtx || !audioOn) return;
+      const now  = audioCtx.currentTime;
+      const len  = audioCtx.sampleRate * 0.06;
+      const buf  = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) {
+        const env = Math.exp(-i / (len * 0.18));
+        data[i]   = (Math.random() * 2 - 1) * env;
+      }
+      const src  = audioCtx.createBufferSource();
+      src.buffer = buf;
+      const lp   = audioCtx.createBiquadFilter();
+      lp.type    = 'lowpass'; lp.frequency.value = 800;
+      const gain = audioCtx.createGain(); gain.gain.value = 0.22;
+      src.connect(lp); lp.connect(gain); gain.connect(masterGain);
+      src.start(now);
+    }
+
+    /* Tracking grind */
+    function playTrackingGrind() {
+      if (!audioCtx || !audioOn) return;
+      const now  = audioCtx.currentTime, dur = 0.9;
+      const osc  = audioCtx.createOscillator();
+      osc.type   = 'sawtooth'; osc.frequency.value = 85;
+      osc.frequency.linearRampToValueAtTime(55, now + dur * 0.5);
+      osc.frequency.linearRampToValueAtTime(90, now + dur);
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      const lp   = audioCtx.createBiquadFilter();
+      lp.type    = 'lowpass'; lp.frequency.value = 600;
+      osc.connect(lp); lp.connect(gain); gain.connect(masterGain);
+      osc.start(now); osc.stop(now + dur);
+      playCrackle(0.4, 0.15);
+    }
+
+    /* Exit static burst */
+    function playStaticBurst(duration = 1.2) {
+      if (!audioCtx || !audioOn) return;
+      const len  = audioCtx.sampleRate * duration;
+      const buf  = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+      const src  = audioCtx.createBufferSource();
+      src.buffer = buf;
+      const lp   = audioCtx.createBiquadFilter();
+      lp.type    = 'lowpass'; lp.frequency.value = 5000;
+      const gain = audioCtx.createGain();
+      const now  = audioCtx.currentTime;
+      gain.gain.setValueAtTime(0.35, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+      src.connect(lp); lp.connect(gain); gain.connect(masterGain);
+      src.start();
+    }
+
+    /* ── SND toggle ── */
+    function enableAudio() {
+      initAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      audioOn = true;
+      sndBtn.textContent = 'SND ●';
+      sndBtn.classList.add('on');
+    }
+    function disableAudio() {
+      audioOn = false;
+      window.speechSynthesis && window.speechSynthesis.cancel();
+      sndBtn.textContent = 'SND ○';
+      sndBtn.classList.remove('on');
+    }
+    sndBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      audioOn ? disableAudio() : enableAudio();
+    });
+
+    /* ── TIMECODE ── */
+    let startMs = null;
+    setInterval(() => {
+      if (!startMs) return;
+      const t = ((Date.now() - startMs) / 1000) | 0;
+      const h = (t/3600|0).toString().padStart(2,'0');
+      const m = ((t%3600)/60|0).toString().padStart(2,'0');
+      const s = (t%60).toString().padStart(2,'0');
+      timecodeEl.textContent = `${h}:${m}:${s}`;
+    }, 1000);
+
+    /* ══════════════════════════════════
+       EARLY SKIP — click at any point during intro to jump straight to label
+    ══════════════════════════════════ */
+    let introComplete = false;
+
+    function earlySkip() {
+      if (introComplete) return;
+      introComplete = true;
+      clearInterval(s2iv);
+      clearBands();
+      setNoise(0.04);
+      pline.style.display = 'none';
+      scanlinesEl.style.opacity = '1';
+      promptEl.style.opacity = '0';
+      startMs = startMs || Date.now();
+      hudBR.style.opacity = '1';
+      hudTL.style.opacity = '1';
+      trackingBtn.style.opacity = '1';
+      sndBtn.style.opacity = '1';
+      if (!audioOn) enableAudio();
+      revealLabel();
+      startAmbient();
+      initIdleTimer();
+    }
+
+    // Register skip listener immediately — works during any stage
+    document.addEventListener('click', function skipHandler(e) {
+      // Don't intercept HUD buttons or any <a> links (resume, instagram, etc.)
+      if (sndBtn.contains(e.target) || trackingBtn.contains(e.target)) return;
+      if (e.target.closest('a')) return;
+      if (!introComplete) { earlySkip(); }
+    });
+    document.addEventListener('keydown', function(e) {
+      if ((e.key === ' ' || e.key === 'Enter') && !introComplete) earlySkip();
+    });
+
+    /* ══════════════
+       STAGE 1 — POWER ON
+    ══════════════ */
+    function stage1() {
+      setNoise(0); initAudio();
+      if (audioOn) playPowerHum();
+      pline.style.opacity = '1';
+      pline.style.transition = 'opacity 0.12s ease';
+      setTimeout(() => {
+        pline.style.transition = 'height 0.88s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease 0.6s';
+        pline.style.height = '100vh';
+        pline.style.background = '#060604';
+        pline.style.boxShadow = 'none';
+        scanlinesEl.style.transition = 'opacity 0.5s ease 0.2s';
+        scanlinesEl.style.opacity = '1';
+        setTimeout(() => { pline.style.opacity = '0'; setTimeout(stage2, 950); }, 280);
+      }, 220);
+    }
+
+    /* ══════════════
+       STAGE 2 — TRACKING ERROR
+    ══════════════ */
+    let s2iv = null;
+    function stage2() {
+      playCrackle(2.0, 0.3);
+      setNoise(0.24);
+      function spawnBands() {
+        clearBands();
+        const vH = window.innerHeight;
+        for (let i = 0; i < 5 + (Math.random() * 7 | 0); i++)
+          addBand(Math.random()*vH, 2+Math.random()*38, 0.1+Math.random()*0.48, (Math.random()-0.5)*110);
+        if (Math.random() < 0.5)
+          addBand(Math.random()*vH, 3+Math.random()*12, 0, 0,
+            Math.random()<0.5 ? 'rgba(255,30,80,0.38)' : 'rgba(30,210,255,0.32)');
+      }
+      s2iv = setInterval(spawnBands, 85);
+      setTimeout(stage3, 2000);
+    }
+
+    /* ══════════════
+       STAGE 3 — STABILISING
+    ══════════════ */
+    function stage3() {
+      clearInterval(s2iv);
+      let noiseLevel = 0.24;
+      const noiseStep = setInterval(() => {
+        noiseLevel = Math.max(0.04, noiseLevel - 0.022);
+        noiseEl.style.opacity = noiseLevel;
+      }, 65);
+      let cc = 0;
+      const clearStep = setInterval(() => {
+        clearBands();
+        const vH = window.innerHeight;
+        for (let i = 0; i < Math.max(0, 7 - cc * 2); i++)
+          addBand(Math.random()*vH*((cc+1)/5), 2+Math.random()*22, 0.07+Math.random()*(0.28-cc*0.04), (Math.random()-0.5)*(65-cc*10));
+        cc++;
+        if (cc >= 6) { clearInterval(clearStep); clearBands(); }
+      }, 160);
+      setTimeout(() => {
+        clearInterval(noiseStep); clearInterval(clearStep); clearBands();
+        setNoise(0.04);
+        setTimeout(stage4, 260);
+      }, 900);
+    }
+
+    /* ══════════════
+       STAGE 4 — PRESS PLAY
+    ══════════════ */
+    function stage4() {
+      if (introComplete) return;
+      startMs = Date.now();
+      hudBR.style.opacity = '1';
+      hudTL.style.opacity = '1';
+      trackingBtn.style.opacity = '1';
+      sndBtn.style.opacity = '1';
+      promptEl.style.opacity = '1';
+      const text = 'PRESS PLAY ';
+      let i = 0;
+      function tick() {
+        if (introComplete) return;          // already skipped
+        if (i <= text.length) {
+          promptEl.innerHTML = text.slice(0,i) + '<span class="cur">█</span>';
+          i++;
+          setTimeout(tick, 72 + Math.random() * 60);
+        } else {
+          startAmbient();
+          initIdleTimer();
+          // Auto-advance after 2.5s if user hasn't clicked
+          setTimeout(() => { if (!introComplete) earlySkip(); }, 2500);
+        }
+      }
+      setTimeout(tick, 200);
+    }
+
+    /* ══════════════
+       LABEL REVEAL (shared)
+    ══════════════ */
+    let labelRevealed = false;
+    function revealLabel() {
+      if (labelRevealed) return;
+      glitchBurst(() => {
+        promptEl.style.opacity      = '0';
+        promptEl.style.pointerEvents = 'none';
+        labelWrap.classList.add('show');
+        vcrNav.classList.add('show');
+        labelRevealed = true;
+        startMouseTracking();
+        setTimeout(() => { playWelcomeChord(); }, 80);
+      });
+    }
+
+    /* Legacy onPlay — still called from the early-skip path */
+    function onPlay() { earlySkip(); }
+
+    function glitchBurst(cb) {
+      playCrackle(0.45, 0.28);
+      setNoise(0.44);
+      let t = 0;
+      const iv = setInterval(() => {
+        clearBands();
+        const vH = window.innerHeight;
+        for (let i = 0; i < 9+(Math.random()*9|0); i++)
+          addBand(Math.random()*vH, 3+Math.random()*48, 0.12+Math.random()*0.58, (Math.random()-0.5)*150);
+        t++;
+        if (t >= 9) { clearInterval(iv); clearBands(); setNoise(0.04); cb(); }
+      }, 52);
+    }
+
+    /* ══════════════════════════════════
+       INTERACTION 1: Mouse → CRT drift + label 3D tilt
+    ══════════════════════════════════ */
+    let mouseTrackingActive = false;
+    let trackingRaf = null;
+
+    // Screen 3D tilt state
+    let screenTiltX = 0, screenTiltY = 0;
+    let screenTargetTX = 0, screenTargetTY = 0;
+
+    function startMouseTracking() {
+      mouseTrackingActive = true;
+      document.addEventListener('mousemove', onMouseMove);
+      function animFrame() {
+        // Lerp screen tilt toward target
+        screenTiltX += (screenTargetTX - screenTiltX) * 0.04;
+        screenTiltY += (screenTargetTY - screenTiltY) * 0.04;
+        const tx = screenTiltX.toFixed(3);
+        const ty = screenTiltY.toFixed(3);
+        if (Math.abs(screenTiltX) > 0.005 || Math.abs(screenTiltY) > 0.005) {
+          screenEl.style.transform = `perspective(1600px) rotateX(${tx}deg) rotateY(${ty}deg)`;
+        } else {
+          screenEl.style.transform = '';
+        }
+        trackingRaf = requestAnimationFrame(animFrame);
+      }
+      animFrame();
+    }
+
+    function onMouseMove(e) {
+      if (!mouseTrackingActive) return;
+      resetIdleTimer();
+      // Map mouse position to screen 3D tilt — gentle, max ±4deg each axis
+      const nx = (e.clientX / window.innerWidth  - 0.5);  // -0.5 … +0.5
+      const ny = (e.clientY / window.innerHeight - 0.5);  // -0.5 … +0.5
+      screenTargetTX = -ny * 5;   // mouse up → tilt top toward viewer
+      screenTargetTY =  nx * 7;   // mouse right → tilt right toward viewer
+    }
+
+    /* ══════════════════════════════════
+       INTERACTION 2: Label hover → chromatic pulse
+    ══════════════════════════════════ */
+    let labelGlitchCooldown = false;
+    vhsLabel.addEventListener('mouseenter', () => {
+      if (labelGlitchCooldown) return;
+      labelGlitchCooldown = true;
+      playCrackle(0.1, 0.07);
+      const prev = parseFloat(noiseEl.style.opacity) || 0.04;
+      setNoise(0.13);
+      const vH = window.innerHeight;
+      const b1 = addBand(Math.random()*vH, 2+Math.random()*8, 0.11, (Math.random()-0.5)*28);
+      setTimeout(() => { b1.remove(); setNoise(prev); }, 130);
+      setTimeout(() => { labelGlitchCooldown = false; }, 1200);
+    });
+
+    /* ══════════════════════════════════
+       INTERACTION 3: Click black background → glitch
+    ══════════════════════════════════ */
+    screenEl.addEventListener('click', e => {
+      if (!labelRevealed || !introComplete) return;
+      // Ignore if click was on label or nav
+      if (vhsLabel.contains(e.target) || vcrNav.contains(e.target)) return;
+      // Ignore if click on HUD buttons
+      if (trackingBtn.contains(e.target) || sndBtn.contains(e.target)) return;
+      bgGlitch();
+    });
+
+    function bgGlitch() {
+      playCrackle(0.3, 0.22);
+      const prev = parseFloat(noiseEl.style.opacity) || 0.04;
+      setNoise(0.28);
+      let t = 0;
+      const iv = setInterval(() => {
+        clearBands();
+        const vH = window.innerHeight;
+        for (let i = 0; i < 5+(Math.random()*7|0); i++)
+          addBand(Math.random()*vH, 2+Math.random()*32, 0.08+Math.random()*0.38, (Math.random()-0.5)*100);
+        t++;
+        if (t >= 6) { clearInterval(iv); clearBands(); setNoise(prev); }
+      }, 55);
+    }
+
+    /* ══════════════════════════════════
+       INTERACTION 4: Tracking button
+    ══════════════════════════════════ */
+    let trackingCooldown = false;
+    trackingBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (trackingCooldown) return;
+      trackingCooldown = true;
+      trackingBtn.classList.add('active');
+      trackingBtn.textContent = 'TRACKING ◌';
+      playTrackingGrind();
+      setNoise(0.3);
+      let t = 0;
+      const iv = setInterval(() => {
+        clearBands();
+        const vH = window.innerHeight;
+        const intensity = Math.max(0.02, 0.25 - t * 0.025);
+        for (let i = 0; i < Math.max(0, 6-t); i++)
+          addBand(Math.random()*vH, 2+Math.random()*(30-t*4), intensity*0.5+Math.random()*intensity, (Math.random()-0.5)*(80-t*10));
+        t++;
+        if (t >= 9) {
+          clearInterval(iv); clearBands(); setNoise(0.04);
+          trackingBtn.textContent = 'TRACKING ●';
+          setTimeout(() => {
+            trackingBtn.classList.remove('active');
+            trackingBtn.textContent = 'TRACKING ◉';
+            trackingCooldown = false;
+          }, 1200);
+        }
+      }, 100);
+    });
+
+    /* ══════════════
+       AMBIENT EFFECTS
+    ══════════════ */
+    let ambientActive = true;
+
+    function startAmbient() { scheduleDrift(); scheduleSignalDrop(); scheduleLumaJitter(); }
+
+    function scheduleDrift() {
+      if (!ambientActive) return;
+      setTimeout(() => {
+        if (!ambientActive) return;
+        const band = document.createElement('div');
+        band.style.cssText = `position:absolute;left:0;right:0;top:-35px;height:22px;
+          background:rgba(255,255,255,0.058);pointer-events:none;transition:top 3.2s linear;`;
+        bandsEl.appendChild(band);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          band.style.top = window.innerHeight + 'px';
+          setTimeout(() => band.remove(), 3300);
+        }));
+        scheduleDrift();
+      }, 10000 + Math.random() * 5500);
+    }
+
+    function scheduleSignalDrop() {
+      if (!ambientActive) return;
+      setTimeout(() => {
+        if (!ambientActive) return;
+        const prev = parseFloat(noiseEl.style.opacity) || 0.04;
+        setNoise(0.26);
+        const vH = window.innerHeight;
+        const bs = [];
+        for (let i = 0; i < 7; i++) bs.push(addBand(Math.random()*vH, 2+Math.random()*22, 0.16+Math.random()*0.35, (Math.random()-0.5)*52));
+        setTimeout(() => { bs.forEach(b => b.remove()); setNoise(prev); }, 85);
+        scheduleSignalDrop();
+      }, 22000 + Math.random() * 13000);
+    }
+
+    function scheduleLumaJitter() {
+      if (!ambientActive) return;
+      setTimeout(() => {
+        if (!ambientActive) return;
+        screenEl.style.filter = `brightness(${0.86 + Math.random() * 0.24})`;
+        setTimeout(() => { screenEl.style.filter = ''; scheduleLumaJitter(); }, 55 + Math.random() * 110);
+      }, 3200 + Math.random() * 5500);
+    }
+
+    /* ══════════════════════════════════
+       SCREENSAVER — idle 15s
+    ══════════════════════════════════ */
+    let idleTimer = null;
+    let ssRaf     = null;
+    let ssActive  = false;
+    let ssX = 10, ssY = 10, ssDX = 0.28, ssDY = 0.19;
+
+    function initIdleTimer() { resetIdleTimer(); }
+
+    function resetIdleTimer() {
+      clearTimeout(idleTimer);
+      if (ssActive) dismissScreensaver();
+      idleTimer = setTimeout(showScreensaver, 15000);
+    }
+
+    function showScreensaver() {
+      ssActive = true;
+      screensaver.classList.add('active');
+      ssX  = 10 + Math.random() * 70;
+      ssY  = 10 + Math.random() * 70;
+      ssDX = (Math.random() < 0.5 ? 1 : -1) * (0.22 + Math.random() * 0.2);
+      ssDY = (Math.random() < 0.5 ? 1 : -1) * (0.14 + Math.random() * 0.15);
+      animateSS();
+    }
+
+    function dismissScreensaver() {
+      ssActive = false;
+      screensaver.classList.remove('active');
+      cancelAnimationFrame(ssRaf);
+    }
+
+    function animateSS() {
+      ssX += ssDX; ssY += ssDY;
+      const wPct = 20; const hPct = 15;
+      if (ssX <= 0 || ssX >= 100 - wPct) {
+        ssDX *= -1;
+        // Occasional color change on bounce
+        if (Math.random() < 0.4) {
+          const hue = [
+            'rgba(180,160,55,0.65)', 'rgba(180,70,70,0.6)', 'rgba(50,180,200,0.6)'
+          ][Math.floor(Math.random()*3)];
+          ssLogo.style.color = hue;
+        }
+      }
+      if (ssY <= 0 || ssY >= 100 - hPct) ssDY *= -1;
+      ssLogo.style.left = ssX + '%';
+      ssLogo.style.top  = ssY + '%';
+      if (ssActive) ssRaf = requestAnimationFrame(animateSS);
+    }
+
+    screensaver.addEventListener('click', () => { resetIdleTimer(); });
+    document.addEventListener('mousemove', () => { if (labelRevealed) resetIdleTimer(); });
+    document.addEventListener('keydown',   () => { if (labelRevealed) resetIdleTimer(); });
+
+    /* ══════════════
+       VCR NAV HOVER + CLICK
+    ══════════════ */
+    document.querySelectorAll('.vcr-btn').forEach(btn => {
+      const type = btn.dataset.href.includes('about') ? 'rw'
+                 : btn.dataset.href.includes('works') ? 'ff' : 'stop';
+      btn.addEventListener('mouseenter', () => {
+        playVcrClick();
+        const d = document.createElement('div');
+        if (type === 'rw')
+          d.style.cssText = `position:absolute;inset:0;background:linear-gradient(to right,rgba(255,40,40,0.07) 0%,transparent 40%);pointer-events:none;transition:opacity 0.3s;`;
+        else if (type === 'ff')
+          d.style.cssText = `position:absolute;inset:0;background:linear-gradient(to left,rgba(40,220,255,0.07) 0%,transparent 40%);pointer-events:none;transition:opacity 0.3s;`;
+        else
+          d.style.cssText = `position:absolute;inset:0;background:rgba(255,255,255,0.03);pointer-events:none;transition:opacity 0.2s;`;
+        bandsEl.appendChild(d);
+        setTimeout(() => { d.style.opacity = '0'; setTimeout(() => d.remove(), 310); }, 180);
+      });
+      btn.addEventListener('click', e => { e.stopPropagation(); exitTo(btn.dataset.href); });
+    });
+
+    /* ══════════════
+       EXIT ANIMATION
+    ══════════════ */
+    function exitTo(href) {
+      ambientActive = false;
+      mouseTrackingActive = false;
+      cancelAnimationFrame(trackingRaf);
+      cancelAnimationFrame(ssRaf);
+      window.speechSynthesis && window.speechSynthesis.cancel();
+      playStaticBurst(1.4);
+      setNoise(0.4);
+      let tick = 0;
+      const iv = setInterval(() => {
+        clearBands();
+        const vH = window.innerHeight;
+        for (let i = 0; i < 10+(Math.random()*12|0); i++)
+          addBand(Math.random()*vH, 3+Math.random()*58, 0.1+Math.random()*0.62, (Math.random()-0.5)*240);
+        tick++;
+        if (tick === 7)  nosigEl.style.opacity = '1';
+        if (tick === 10) { nosigEl.style.opacity = '0'; setNoise(0.88); clearBands(); }
+        if (tick >= 14)  {
+          clearInterval(iv);
+          flashEl.style.transition = 'opacity 0.06s ease';
+          flashEl.style.opacity    = '1';
+          setTimeout(() => { window.location.href = href; }, 340);
+        }
+      }, 58);
+    }
+
+    /* ── RESIZE ── */
+    window.addEventListener('resize', () => { noiseEl.width = 320; noiseEl.height = 180; });
+
+    /* ── GO ── */
+    setTimeout(stage1, 250);
+
+  })();
+  </script>
+
+</body>
+</html>

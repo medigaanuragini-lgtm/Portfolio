@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — Anuragini Mediga</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      background: #0d0b09;
+      font-family: 'Share Tech Mono', monospace;
+      color: #e8dfc8;
+    }
+
+    /* Film grain overlay */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 999; pointer-events: none;
+      opacity: 0.055;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode: screen;
+    }
+
+    /* ── PAGE ── */
+    .page {
+      width: 100vw; height: 100vh;
+      display: flex; flex-direction: column;
+      padding: 12px 16px 12px;
+      gap: 8px;
+      animation: page-in 0.5s ease both;
+    }
+    @keyframes page-in {
+      from { opacity: 0; filter: brightness(0.6); }
+      to   { opacity: 1; filter: none; }
+    }
+
+    /* ── HEADER ── */
+    .sb-header {
+      flex-shrink: 0;
+      background: #18140f;
+      border: 1.5px solid #3d3428;
+      padding: 10px 18px 12px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: end;
+      gap: 16px;
+    }
+
+    .sb-fields { display: flex; flex-direction: column; gap: 5px; }
+
+    .sb-field {
+      font-size: 0.5rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #7a6e5e;
+      line-height: 1;
+    }
+    .sb-field-val {
+      display: inline-block;
+      min-width: 70px;
+      border-bottom: 1px solid #e8dfc8;
+      padding-bottom: 1px;
+      margin-left: 5px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0.05em;
+      color: #e8dfc8;
+    }
+
+    /* Center */
+    .sb-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+    }
+    .sb-center-title {
+      font-family: 'VT323', monospace;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 400;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      line-height: 1;
+      border-bottom: 1.5px solid #e8dfc8;
+      padding-bottom: 5px;
+      width: 100%;
+      text-align: center;
+      color: #e8dfc8;
+    }
+    .sb-center-nav {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .sb-center-nav a {
+      text-decoration: none;
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      color: #e8dfc8;
+      font-weight: 700;
+      text-transform: uppercase;
+      transition: color 0.2s, opacity 0.2s;
+    }
+    .sb-center-nav a:hover { color: #c9a84c; opacity: 1; }
+    .sb-center-nav .dot { color: #4a4035; font-size: 0.68rem; }
+
+    /* Right */
+    .sb-fields-right {
+      display: flex; flex-direction: column;
+      align-items: flex-end; gap: 5px;
+      text-align: right;
+    }
+    .sb-fields-right .sb-field-val { min-width: 80px; }
+
+    /* ── PANEL GRID ── */
+    .panels {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    /* ── PANEL SHELL ── */
+    /* NOTE: NO transform on .panel ever — it breaks perspective + backface-visibility.
+       Box-shadow only for depth cues. Scale lives on .panel-inner only. */
+    .panel {
+      border: 1.5px solid #3d3428;
+      position: relative;
+      cursor: pointer;
+      perspective: 1400px;
+      transition: box-shadow 0.3s ease;
+      z-index: 1;
+      /* NO overflow:hidden anywhere in the 3D ancestor chain —
+         it creates a stacking context that kills backface-visibility */
+    }
+
+    /* Stagger entrance */
+    .panel:nth-child(1) { animation: panel-in 0.45s ease 0.15s both; }
+    .panel:nth-child(2) { animation: panel-in 0.45s ease 0.25s both; }
+    .panel:nth-child(3) { animation: panel-in 0.45s ease 0.35s both; }
+    .panel:nth-child(4) { animation: panel-in 0.45s ease 0.45s both; }
+    @keyframes panel-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* Stage 1 — GIF playing: lift via shadow */
+    .panel.gif-playing {
+      z-index: 5;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.55);
+    }
+
+    /* Stage 2 — Revealed: deeper shadow */
+    .panel.revealed {
+      z-index: 10;
+      box-shadow: 0 14px 44px rgba(0,0,0,0.75);
+    }
+
+    /* Manually flipped */
+    .panel.flipped {
+      z-index: 8;
+      box-shadow: 0 10px 36px rgba(0,0,0,0.65);
+    }
+
+    /* ── FLIP INNER ── */
+    .panel-inner {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      transition: transform 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .panel.revealed .panel-inner,
+    .panel.flipped .panel-inner {
+      transform: rotateY(180deg);
+    }
+
+    /* ── SHARED FACE ──
+       CRITICAL: NO overflow:hidden here — it breaks backface-visibility
+       in Chrome/Safari. Clipping handled by parent .panel instead. */
+    .panel-front,
+    .panel-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      will-change: transform;      /* forces own GPU compositing layer */
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;            /* safe here — these elements themselves transform */
+    }
+
+    /* ── FRONT ── */
+    .panel-front { background: #18140f; }
+
+    /* Top label bar */
+    .panel-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 11px;
+      border-bottom: 1.5px solid #3d3428;
+      background: #211c16;
+      flex-shrink: 0;
+    }
+    .panel-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(0.75rem, 1.2vw, 1rem);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #e8dfc8;
+      line-height: 1;
+    }
+    .panel-scene {
+      font-size: clamp(0.38rem, 0.55vw, 0.45rem);
+      letter-spacing: 0.13em;
+      color: #7a6e5e;
+      text-transform: uppercase;
+    }
+
+    /* Image fills frame */
+    .panel-media {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      min-height: 0;
+      background: #111;
+    }
+    .panel-media img,
+    .panel-media video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .panel-media img   { opacity: 1; z-index: 2; transition: opacity 0.5s ease; }
+    .panel-media video { opacity: 0; z-index: 1; transition: opacity 0.5s ease; }
+
+    /* Fade image out, video in when GIF is playing */
+    .panel.gif-playing .panel-media img   { opacity: 0; }
+    .panel.gif-playing .panel-media video { opacity: 1; z-index: 3; }
+
+    /* Subtle flip hint */
+    .flip-hint {
+      position: absolute;
+      bottom: 7px;
+      right: 9px;
+      font-size: clamp(0.3rem, 0.44vw, 0.38rem);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(232, 223, 200, 0.2);
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 5;
+    }
+    .panel.gif-playing .flip-hint,
+    .panel.revealed .flip-hint { opacity: 0; }
+
+    /* ── BACK ── */
+    .panel-back {
+      transform: rotateY(180deg) translateZ(1px); /* 1px forward prevents z-fighting */
+      background-color: #141210;
+    }
+
+    /* Back bar — no heading, just scene ref */
+    .panel-back .panel-bar {
+      background: #1c1812;
+      border-bottom-color: #2e2820;
+    }
+    .panel-back .panel-scene { color: #6a5e4e; }
+
+    /* Notes area — ruled lines synced to text baseline.
+       14px font / 34px line-height in Share Tech Mono:
+       baseline ≈ top + 21px per line.
+       padding-top: 13px → first baseline at 13+21 = 34px = first rule.
+       background-position shifts gradient to match the padding offset. */
+    .notes-inner {
+      flex: 1;
+      padding: 13px 18px 10px;
+      overflow: hidden;
+      min-height: 0;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 33px,
+        rgba(210, 195, 165, 0.14) 33px,
+        rgba(210, 195, 165, 0.14) 34.5px
+      );
+      background-size: 100% 34px;
+      background-position: 0 13px;
+    }
+
+    .notes-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #e8dfc8;
+      line-height: 34px;
+      height: 34px;
+      border-bottom: 1px solid rgba(210, 195, 165, 0.2);
+      margin-bottom: 0;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .notes-body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 14px / 34px — fills the panel, locks to ruled lines */
+    .notes-para,
+    .notes-quote,
+    .notes-list li,
+    .notes-footnote {
+      font-size: 14px;
+      line-height: 34px;
+      letter-spacing: 0.01em;
+      display: block;
+      margin: 0;
+      padding: 0;
+    }
+
+    .notes-para { color: #c8bfaa; }
+
+    .notes-quote {
+      font-style: italic;
+      color: #a09070;
+      padding-left: 10px;
+      border-left: 2px solid rgba(210, 195, 165, 0.35);
+    }
+
+    .notes-list {
+      list-style: none;
+      padding: 0; margin: 0;
+    }
+    .notes-list li {
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+    .notes-list li::before {
+      content: '• ';
+      color: #c9a84c;
+      font-weight: 400;
+    }
+
+    .notes-footnote {
+      color: #6a5e4e;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-top: 1px solid rgba(210, 195, 165, 0.1);
+      font-size: 11px;
+    }
+
+    /* ── SKILLS CHECKLIST ── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      margin-top: 2px;
+    }
+    .skill-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      line-height: 28px;        /* tighter — fits all items without crop */
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #ffffff;
+      margin: 0; padding: 0;
+    }
+    .skill-check {
+      color: #c9a84c;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .skill-label { font-size: 12.5px; }
+
+    .skills-category {
+      grid-column: 1 / -1;
+      font-size: 9.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #5a4e3e;
+      line-height: 26px;
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid rgba(210,195,165,0.08);
+    }
+    .skills-category:first-child { border-top: none; }
+
+    .skills-closing {
+      grid-column: 1 / -1;
+      font-size: 12px;
+      font-style: italic;
+      color: #7a6e5e;
+      line-height: 28px;
+      letter-spacing: 0.04em;
+      margin: 0;
+      padding-top: 2px;
+      border-top: 1px solid rgba(210,195,165,0.12);
+      margin-top: 2px;
+    }
+
+    /* ── VHS FOOTER NAV ── */
+    .page-footer {
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      gap: clamp(24px, 7vw, 64px);
+      padding: 6px 0 8px;
+      border-top: 1px solid #2a2318;
+    }
+    .page-vcr-btn {
+      font-family: 'VT323', monospace;
+      font-size: clamp(1.6rem, 3.2vw, 2.6rem);
+      letter-spacing: 0.12em;
+      color: rgba(210,205,185,0.55);
+      background: none; border: none; cursor: pointer;
+      text-shadow: -1px 0 rgba(255,40,40,0.3), 1px 0 rgba(40,220,255,0.3);
+      transition: color 0.15s, text-shadow 0.15s, transform 0.15s;
+      padding: 2px 4px; user-select: none; text-decoration: none;
+      display: inline-block;
+    }
+    .page-vcr-btn:hover {
+      color: #fff;
+      text-shadow:
+        -3px 0 rgba(255,40,40,0.85),
+         3px 0 rgba(40,220,255,0.85),
+         0 0 18px rgba(255,245,200,0.85),
+         0 0 40px rgba(220,200,120,0.45);
+      transform: scale(1.08);
+    }
+    .page-vcr-btn:active { transform: scale(0.96); }
+
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="sb-header">
+    <div class="sb-fields">
+      <div class="sb-field">Production: <span class="sb-field-val">Me</span></div>
+      <div class="sb-field">Director: <span class="sb-field-val">Also Me</span></div>
+    </div>
+
+    <div class="sb-center">
+      <div class="sb-center-title">A B O U T</div>
+    </div>
+
+    <div class="sb-fields-right">
+      <div class="sb-field">Location: <span class="sb-field-val">Wherever the work takes</span></div>
+      <div class="sb-field">Page: <span class="sb-field-val">01 / 01</span></div>
+    </div>
+  </div>
+
+  <!-- PANELS -->
+  <div class="panels">
+
+    <!-- Panel 1 — Introduction -->
+    <div class="panel" id="p1">
+      <div class="panel-inner">
+        <div class="panel-front">
+          <div class="panel-bar">
+            <span class="panel-label">Introduction</span>
+            <span class="panel-scene">INT. Living Room — Night</span>
+          </div>
+          <div class="panel-media">
+            <img src="About%20me%20page/Panel%201_Introduction.jpg" alt="Introduction">
+            <video muted loop playsinline preload="none">
+              <source src="About%20me%20page/Panel%201_Introduction_Gif.mp4" type="video/mp4">
+            </video>
+          </div>
+          <span class="flip-hint">hover to read ↻</span>
+        </div>
+
+        <div class="panel-back">
+          <div class="notes-inner">
+            <div class="notes-title">Introduction</div>
+            <div class="notes-body">
+              <p class="notes-para">Meet Anuragini — a Creative Media Producer and Filmmaker based in New York City.</p>
+              <p class="notes-para">For the past seven years, she has been finding stories hidden in everyday moments and turning them into cinematic visuals. Cameras, light, and sound are simply the tools she uses to get them there.</p>
+              <p class="notes-quote">Most stories start quietly. She just happens to notice them.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 2 — Experience -->
+    <div class="panel" id="p2">
+      <div class="panel-inner">
+        <div class="panel-front">
+          <div class="panel-bar">
+            <span class="panel-label">Experience</span>
+            <span class="panel-scene">EXT. NYC / HYD — Day</span>
+          </div>
+          <div class="panel-media">
+            <img src="About%20me%20page/Panel%202_Experience.png" alt="Experience">
+            <video muted loop playsinline preload="none">
+              <source src="About%20me%20page/Panel%202_Experience_Gif.mp4" type="video/mp4">
+            </video>
+          </div>
+          <span class="flip-hint">hover to read ↻</span>
+        </div>
+
+        <div class="panel-back">
+          <div class="notes-inner">
+            <div class="notes-title">Experience</div>
+            <div class="notes-body">
+              <p class="notes-para">Over the years, she has worked across advertising, documentaries, branded films, podcasts, and digital storytelling.</p>
+              <p class="notes-para">Her role often shifts — producer, camera operator, lighting setup, editor. From concept to final cut.</p>
+              <ul class="notes-list">
+                <li>7+ years in the field</li>
+                <li>50+ projects delivered</li>
+                <li>40+ clients across industries</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 3 — What I Do -->
+    <div class="panel" id="p3">
+      <div class="panel-inner">
+        <div class="panel-front">
+          <div class="panel-bar">
+            <span class="panel-label">What I Do</span>
+            <span class="panel-scene">INT. Ideas Room — Always</span>
+          </div>
+          <div class="panel-media">
+            <img src="About%20me%20page/Panel%203_What%20I%20do.png" alt="What I Do">
+            <video muted loop playsinline preload="none">
+              <source src="About%20me%20page/Panel%203_What%20I%20do_Gif.mp4" type="video/mp4">
+            </video>
+          </div>
+          <span class="flip-hint">hover to read ↻</span>
+        </div>
+
+        <div class="panel-back">
+          <div class="notes-inner">
+            <div class="notes-title">What I Do</div>
+            <div class="notes-body">
+              <p class="notes-para">She takes an idea and follows it all the way to the screen.</p>
+              <ul class="notes-list">
+                <li>Concept development</li>
+                <li>Producing and directing</li>
+                <li>Camera and lighting</li>
+                <li>Editing and post-production</li>
+              </ul>
+              <p class="notes-quote">One idea enters the room. A finished story walks out.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 4 — Tools & Skills -->
+    <div class="panel" id="p4">
+      <div class="panel-inner">
+        <div class="panel-front">
+          <div class="panel-bar">
+            <span class="panel-label">Tools &amp; Skills</span>
+            <span class="panel-scene">INT. Studio — Anytime</span>
+          </div>
+          <div class="panel-media">
+            <img src="About%20me%20page/Panel%203_Skills%20and%20Tools.jpg" alt="Tools and Skills">
+            <video muted loop playsinline preload="none">
+              <source src="About%20me%20page/Panel%203_Skills%20and%20Tools_Gif.mp4" type="video/mp4">
+            </video>
+          </div>
+          <span class="flip-hint">hover to read ↻</span>
+        </div>
+
+        <div class="panel-back">
+          <div class="notes-inner">
+            <div class="notes-title">Tools &amp; Skills</div>
+            <div class="skills-grid">
+
+              <div class="skills-category">Camera &amp; Production</div>
+              <div class="skill-item"><span class="skill-check">✓</span><span class="skill-label">Sony FX6</span></div>
+              <div class="skill-item"><span class="skill-check">✓</span><span class="skill-label">Blackmagic Cinema</span></div>
+              <div class="skill-item"><span class="skill-check">✓</span><span class="skill-label">Cinematography</span></div>
+              <div class="skill-item"><span class="skill-check">✓</span><span class="skill-label">Lighting Design</span></div>
+
+              <div class="skills-category">Editing &amp; Post</div>
+              <div class="skill-item"><span class="skill-check">✓</span><span class="skill-label">Premiere Pro</span></div>
+              <div class="skill-item"><span class="skill-check">✓</span><span class="skill-label">DaVinci Resolve</span></div>
+              <div class="skill-item"><span class="skill-check">✓</span><span class="skill-label">After Effects</span></div>
+              <div class="skill-item"><span class="skill-check">✓</span><span class="skill-label">Color Grading</span></div>
+
+              <div class="skills-category">Creative &amp; Strategy</div>
+              <div class="skill-item"><span class="skill-check">✓</span><span class="skill-label">Scriptwriting</span></div>
+              <div class="skill-item"><span class="skill-check">✓</span><span class="skill-label">Creative Direction</span></div>
+              <div class="skill-item"><span class="skill-check">✓</span><span class="skill-label">Content Strategy</span></div>
+              <div class="skill-item"><span class="skill-check">✓</span><span class="skill-label">Meta Ads + SEO</span></div>
+
+              <div class="skills-closing">Every story has different needs — and different skills.</div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /panels -->
+
+  <!-- FOOTER NAV -->
+  <footer class="page-footer">
+    <a class="page-vcr-btn" href="index.html">○ HOME</a>
+    <a class="page-vcr-btn" href="works.html">►► WORKS</a>
+    <a class="page-vcr-btn" href="contact.html">CONTACT □</a>
+  </footer>
+
+</div><!-- /page -->
+
+<script>
+  const timers = new Map();
+
+  document.querySelectorAll('.panel').forEach(panel => {
+    const video = panel.querySelector('video');
+
+    panel.addEventListener('mouseenter', () => {
+      // Don't re-trigger if manually flipped
+      if (panel.classList.contains('flipped')) return;
+
+      // Stage 1 — play GIF, subtle lean-in
+      if (video) { video.currentTime = 0; video.play().catch(() => {}); }
+      panel.classList.add('gif-playing');
+
+      // Stage 2 — after 1s, zoom + reveal back
+      const t = setTimeout(() => {
+        panel.classList.remove('gif-playing');
+        panel.classList.add('revealed');
+        if (video) { video.pause(); video.currentTime = 0; }
+      }, 1000);
+
+      timers.set(panel, t);
+    });
+
+    panel.addEventListener('mouseleave', () => {
+      const t = timers.get(panel);
+      if (t) { clearTimeout(t); timers.delete(panel); }
+
+      if (video) { video.pause(); video.currentTime = 0; }
+      panel.classList.remove('gif-playing', 'revealed');
+    });
+
+    // Click / tap toggle
+    panel.addEventListener('click', () => {
+      panel.classList.toggle('flipped');
+    });
+  });
+</script>
+
+</body>
+</html>
