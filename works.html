@@ -498,6 +498,44 @@
     #monitor-link:hover { background: rgba(201,168,76,0.1); }
     #monitor-link.hidden { display: none; }
 
+    /* Gallery nav arrows */
+    .gallery-arrow {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      z-index: 10;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(201,168,76,0.25);
+      color: var(--amber);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.3rem;
+      font-weight: bold;
+      padding: 14px 10px;
+      cursor: pointer;
+      transition: background .13s, border-color .13s;
+      line-height: 1;
+      user-select: none;
+    }
+    .gallery-arrow:hover { background: rgba(201,168,76,0.15); border-color: rgba(201,168,76,0.5); }
+    .gallery-arrow.hidden { display: none; }
+    #gallery-prev { left: 10px; }
+    #gallery-next { right: 10px; }
+
+    /* Gallery counter */
+    #gallery-counter {
+      position: absolute;
+      top: 10px; right: 14px;
+      z-index: 10;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .68rem;
+      font-weight: bold;
+      letter-spacing: .14em;
+      color: rgba(201,168,76,0.7);
+      background: rgba(0,0,0,0.55);
+      padding: 3px 8px;
+      border-radius: 2px;
+    }
+    #gallery-counter.hidden { display: none; }
+
     /* Scanline overlay inside monitor */
     #monitor-scanlines {
       position: absolute; inset: 0;
@@ -507,7 +545,7 @@
         rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
       );
       pointer-events: none;
-      z-index: 3;
+      z-index: 4;
     }
 
   </style>
