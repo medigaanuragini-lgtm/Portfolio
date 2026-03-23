@@ -1060,24 +1060,21 @@
       cancelAnimationFrame(trackingRaf);
       cancelAnimationFrame(ssRaf);
       window.speechSynthesis && window.speechSynthesis.cancel();
-      playStaticBurst(1.4);
-      setNoise(0.4);
-      let tick = 0;
-      const iv = setInterval(() => {
-        clearBands();
-        const vH = window.innerHeight;
-        for (let i = 0; i < 10+(Math.random()*12|0); i++)
-          addBand(Math.random()*vH, 3+Math.random()*58, 0.1+Math.random()*0.62, (Math.random()-0.5)*240);
-        tick++;
-        if (tick === 7)  nosigEl.style.opacity = '1';
-        if (tick === 10) { nosigEl.style.opacity = '0'; setNoise(0.88); clearBands(); }
-        if (tick >= 14)  {
-          clearInterval(iv);
-          flashEl.style.transition = 'opacity 0.06s ease';
-          flashEl.style.opacity    = '1';
-          setTimeout(() => { window.location.href = href; }, 340);
-        }
-      }, 58);
+      // Use the film-strip wipe (film-transition.js overlay)
+      const fw = document.getElementById('film-wipe');
+      if (fw) {
+        fw.classList.remove('fw-revealing', 'fw-covering');
+        fw.style.animation = 'none';
+        fw.style.transform = 'translateY(101vh)';
+        void fw.offsetHeight;
+        fw.style.animation = '';
+        fw.classList.add('fw-covering');
+        fw.addEventListener('animationend', function() {
+          window.location.href = href;
+        }, { once: true });
+      } else {
+        window.location.href = href;
+      }
     }
 
     /* ── RESIZE ── */
