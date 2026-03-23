@@ -807,10 +807,11 @@
     document.getElementById('clip-count').textContent = totalClips + ' CLIPS';
 
     /* ── Preview card ─────────────────────────────────────────────────────── */
-    const card   = document.getElementById('preview-card');
-    const pvTitle = document.getElementById('pv-title');
-    const pvMeta  = document.getElementById('pv-meta');
-    const pvDesc  = document.getElementById('pv-desc');
+    const card    = document.getElementById('preview-card');
+    const pvPoster = document.getElementById('pv-poster');
+    const pvTitle  = document.getElementById('pv-title');
+    const pvMeta   = document.getElementById('pv-meta');
+    const pvDesc   = document.getElementById('pv-desc');
     let hideTimer = null;
 
     document.querySelectorAll('.clip').forEach(clip => {
@@ -820,6 +821,15 @@
         pvMeta.textContent  = clip.dataset.year + ' · ' + clip.dataset.fmt;
         pvDesc.textContent  = clip.dataset.desc;
         card.style.setProperty('--preview-accent', clip.dataset.accent);
+
+        // Show poster if available (gallery first image or single img)
+        const imgSrc = clip.dataset.gallery0 || clip.dataset.img || '';
+        if (imgSrc) {
+          pvPoster.src = imgSrc;
+          pvPoster.classList.remove('hidden');
+        } else {
+          pvPoster.classList.add('hidden');
+        }
 
         positionCard(e);
         card.classList.add('visible');
