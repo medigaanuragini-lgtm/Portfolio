@@ -789,9 +789,10 @@
         clip.dataset.year  = p.year;
         clip.dataset.fmt   = p.format;
         clip.dataset.desc  = p.desc;
-        clip.dataset.link  = p.link || '';
-        clip.dataset.img   = p.img  || '';
-        clip.dataset.accent = ACCENTS[cat];
+        clip.dataset.link    = p.link || '';
+        clip.dataset.img     = p.img  || '';
+        clip.dataset.gallery0 = (p.gallery && p.gallery[0]) || '';
+        clip.dataset.accent  = ACCENTS[cat];
 
         clip.innerHTML =
           '<div class="clip-inner">' +
