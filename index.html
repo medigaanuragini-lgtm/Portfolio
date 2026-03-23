@@ -794,6 +794,7 @@
         labelWrap.classList.add('show');
         vcrNav.classList.add('show');
         labelRevealed = true;
+        localStorage.setItem('anu_intro_seen', '1');
         startMouseTracking();
         setTimeout(() => { playWelcomeChord(); }, 80);
       });
