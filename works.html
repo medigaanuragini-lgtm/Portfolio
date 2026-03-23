@@ -754,6 +754,7 @@
         clip.dataset.fmt   = p.format;
         clip.dataset.desc  = p.desc;
         clip.dataset.link  = p.link || '';
+        clip.dataset.img   = p.img  || '';
         clip.dataset.accent = ACCENTS[cat];
 
         clip.innerHTML =
@@ -762,11 +763,7 @@
           '<div class="clip-format">' + p.year + ' · ' + p.format.split('·')[0].trim() + '</div>' +
           '</div>';
 
-        if (p.link) {
-          clip.addEventListener('click', () => {
-            window.open(p.link, '_blank', 'noopener');
-          });
-        }
+        clip.addEventListener('click', () => openMonitor(p, cat));
         body.appendChild(clip);
       });
     });
