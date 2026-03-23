@@ -1091,5 +1091,74 @@
   </script>
 
   <script src="film-transition.js"></script>
+
+  <script>
+  /* ── CURSOR SCATTER EFFECT ── */
+  (function() {
+    'use strict';
+
+    const IMAGES = [
+      'Works /Photography/New York City/DSC06470.jpg',
+      'Works /Photography/New York City/DSC06276.jpg',
+      'Works /Photography/New York City/DSC06472.jpg',
+      'Works /Photography/New York City/DSC06322.jpg',
+      'Works /Photography/New York City/DSC06333.jpg',
+      'Works /Feature Films/Night of Melacholia_poster.jpeg',
+      'Works /Feature Films/The Building Blocks of a Bridge_Poster.jpeg',
+      'Works /Podcasts : Documentaries /Ambo_Podcast_2025.png',
+      'Works /Podcasts : Documentaries /Gen Alpha_Podcast.png',
+      'Works /Podcasts : Documentaries /Beyond the Bustle.png',
+      'Works /Brands : Advertising/HubSpot/038-HtH_THUMBNAIL.jpg',
+      'Works /Brands : Advertising/HubSpot/040-HtH_THUMBNAIL.jpg',
+      'Works /Brands : Advertising/Brand Innovators_1.png',
+      'About me page/Panel 1_Introduction.jpg',
+    ];
+
+    const SPAWN_DIST = 80;
+    const IMG_W      = 130;
+    const LIFETIME   = 1200;
+
+    let lastX = -999, lastY = -999, idx = 0;
+    const screen = document.getElementById('screen');
+
+    document.addEventListener('mousemove', function(e) {
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      if (Math.sqrt(dx*dx + dy*dy) < SPAWN_DIST) return;
+      lastX = e.clientX;
+      lastY = e.clientY;
+
+      const img = document.createElement('img');
+      img.src = IMAGES[idx++ % IMAGES.length];
+
+      const rot    = (Math.random() - 0.5) * 36;
+      const driftR = rot + (Math.random() - 0.5) * 18;
+      const driftY = 24 + Math.random() * 36;
+
+      img.style.cssText =
+        'position:absolute;' +
+        'left:' + (e.clientX - IMG_W / 2) + 'px;' +
+        'top:'  + (e.clientY - IMG_W / 2) + 'px;' +
+        'width:' + IMG_W + 'px;' +
+        'height:auto;' +
+        'z-index:1;' +
+        'pointer-events:none;' +
+        'filter:grayscale(1);' +
+        'object-fit:cover;' +
+        'will-change:transform,opacity;';
+
+      screen.appendChild(img);
+
+      img.animate([
+        { opacity: 0.3, transform: 'rotate(' + rot + 'deg) translateY(0) scale(1)' },
+        { opacity: 0,   transform: 'rotate(' + driftR + 'deg) translateY(-' + driftY + 'px) scale(0.88)' }
+      ], {
+        duration: LIFETIME,
+        easing: 'ease-out',
+        fill: 'forwards'
+      }).onfinish = function() { img.remove(); };
+    });
+  })();
+  </script>
 </body>
 </html>
