@@ -328,29 +328,32 @@
       bottom: 0; left: 0; right: 0;
       height: var(--botH);
       z-index: 300;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 22px;
+      display: flex; align-items: center; justify-content: center;
+      gap: clamp(24px, 7vw, 64px);
       background: rgba(8,8,8,.97);
-      border-top: 1px solid var(--border);
-      font-size: .72rem;
-      letter-spacing: .1em;
-      color: var(--dim);
+      border-top: 1px solid #2a2318;
     }
-    #statusbar { justify-content: center; }
-    #statusbar-left { display: flex; align-items: center; gap: 24px; }
-    #clip-count { color: var(--amber); }
-    .sb-nav {
-      display: flex; align-items: center; gap: 32px;
+    .sb-vcr-btn {
+      font-family: 'VT323', monospace;
+      font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+      letter-spacing: 0.12em;
+      color: rgba(210,205,185,0.55);
+      background: none; border: none; cursor: pointer;
+      text-shadow: -1px 0 rgba(255,40,40,0.3), 1px 0 rgba(40,220,255,0.3);
+      transition: color 0.15s, text-shadow 0.15s, transform 0.15s;
+      padding: 2px 4px; user-select: none; text-decoration: none;
+      display: inline-block;
     }
-    .sb-nav a {
-      color: var(--dim);
-      text-decoration: none;
-      letter-spacing: .14em;
-      font-size: .72rem;
-      font-weight: bold;
-      transition: color .14s;
+    .sb-vcr-btn:hover {
+      color: #fff;
+      text-shadow:
+        -3px 0 rgba(255,40,40,0.85),
+         3px 0 rgba(40,220,255,0.85),
+         0 0 18px rgba(255,245,200,0.85),
+         0 0 40px rgba(220,200,120,0.45);
+      transform: scale(1.08);
     }
-    .sb-nav a:hover { color: var(--amber); }
+    .sb-vcr-btn:active { transform: scale(0.96); }
 
     /* ══════════════════════════════════
        MONITOR MODAL
