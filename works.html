@@ -10,18 +10,30 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --amber: #C8873A;
-      --bg:    #080808;
-      --topH:  70px;
-      --footH: 44px;
-      --gap:   4px;
+      --bg:      #080808;
+      --text:    #d8d4bc;
+      --dim:     rgba(216,212,188,0.42);
+      --amber:   #c9a84c;
+      --border:  rgba(201,168,76,0.13);
+      --surface: rgba(255,255,255,0.04);
+      --topH:    54px;
+      --botH:    38px;
+      --labelW:  134px;
+      --clipH:   50px;
+      --clipW:   156px;
+      /* category accents */
+      --doc:     #4a9c6f;
+      --pod:     #4a7fc1;
+      --brand:   #c9a84c;
+      --film:    #9b6fd4;
+      --photo:   #2ab8aa;
     }
 
     html, body {
       width: 100%; height: 100%;
       overflow: hidden;
       background: var(--bg);
-      color: #fff;
+      color: var(--text);
       font-family: 'Share Tech Mono', monospace;
       user-select: none;
     }
@@ -29,1205 +41,620 @@
     /* ── grain ── */
     .grain {
       position: fixed; inset: 0; pointer-events: none;
-      z-index: 900; opacity: .05; mix-blend-mode: overlay;
+      z-index: 900; opacity: .055; mix-blend-mode: overlay;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 200px 200px;
     }
 
     /* ── flash ── */
-    #flash {
-      position: fixed; inset: 0; background: var(--bg);
-      opacity: 0; pointer-events: none; z-index: 800;
-      transition: opacity .28s ease;
-    }
-    #flash.on { opacity: 1; pointer-events: all; }
+    #flash { position: fixed; inset: 0; background: var(--bg); opacity: 0; pointer-events: none; z-index: 800; }
 
     /* ══════════════════════════════════
-       TOPBAR
+       TOOLBAR
     ══════════════════════════════════ */
-    .topbar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    #toolbar {
+      position: fixed; top: 0; left: 0; right: 0;
       height: var(--topH);
-      display: flex; align-items: center; justify-content: center;
-      padding: 0 36px;
-      background: rgba(8,8,8,.95);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(200,135,58,.12);
+      z-index: 300;
+      display: flex; align-items: center; gap: 0;
+      background: rgba(8,8,8,.97);
+      border-bottom: 1px solid var(--border);
     }
-    .topbar-logo {
+
+    /* Left section — app icon + title */
+    #toolbar-left {
+      display: flex; align-items: center; gap: 14px;
+      padding: 0 20px;
+      border-right: 1px solid var(--border);
+      height: 100%;
+      flex-shrink: 0;
+    }
+    #page-title {
       font-family: 'VT323', monospace;
-      font-size: 2rem; letter-spacing: .3em;
-      color: rgba(200,135,58,.8);
+      font-size: 1.55rem;
+      letter-spacing: .28em;
+      color: var(--amber);
     }
-    .topbar-nav { display: flex; gap: 32px; }
-    .topbar-nav a {
-      font-family: 'VT323', monospace;
-      font-size: 1.5rem; letter-spacing: .2em;
-      color: rgba(255,255,255,.55);
-      transition: color .2s;
+    #toolbar-divider {
+      width: 1px; height: 22px;
+      background: var(--border);
     }
-    .topbar-nav a:hover { color: #fff; }
+
+    /* Filter buttons */
+    #filters {
+      display: flex; align-items: center; gap: 4px;
+      padding: 0 18px;
+      flex: 1;
+      overflow-x: auto;
+    }
+    #filters::-webkit-scrollbar { display: none; }
+
+    .filter-btn {
+      display: flex; align-items: center; gap: 7px;
+      padding: 5px 13px;
+      background: none;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 3px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .62rem;
+      letter-spacing: .1em;
+      color: var(--dim);
+      cursor: pointer;
+      transition: background .14s, border-color .14s, color .14s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .filter-btn:hover {
+      background: var(--surface);
+      color: var(--text);
+      border-color: rgba(255,255,255,0.15);
+    }
+    .filter-btn.active {
+      background: rgba(201,168,76,0.1);
+      border-color: rgba(201,168,76,0.35);
+      color: var(--text);
+    }
+    .cat-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-all   { background: var(--amber); }
+    .dot-doc   { background: var(--doc);   }
+    .dot-pod   { background: var(--pod);   }
+    .dot-brand { background: var(--brand); }
+    .dot-film  { background: var(--film);  }
+    .dot-photo { background: var(--photo); }
+
+    /* Right nav */
+    #toolbar-nav {
+      display: flex; align-items: center; gap: 0;
+      border-left: 1px solid var(--border);
+      height: 100%;
+      flex-shrink: 0;
+    }
+    .nav-link {
+      display: flex; align-items: center;
+      height: 100%;
+      padding: 0 16px;
+      font-size: .6rem;
+      letter-spacing: .12em;
+      color: var(--dim);
+      text-decoration: none;
+      border-right: 1px solid var(--border);
+      transition: color .14s, background .14s;
+    }
+    .nav-link:hover {
+      color: var(--text);
+      background: var(--surface);
+    }
 
     /* ══════════════════════════════════
-       SPROCKET STRIPS
+       TIMELINE
     ══════════════════════════════════ */
-    :root { --spr: 32px; } /* sprocket strip width */
-
-    .spr-strip {
-      position: fixed;
-      top: var(--topH); bottom: var(--footH);
-      width: var(--spr);
-      z-index: 150;
-      pointer-events: none;
-      overflow: hidden;
-      /* Dark film-stock colour */
-      background-color: #0e0e0e;
-      /* Inner amber edge line */
-    }
-    .spr-strip.left  { left: 0;  border-right: 1px solid rgba(200,135,58,.14); }
-    .spr-strip.right { right: 0; border-left:  1px solid rgba(200,135,58,.14); }
-
-    /* The repeating hole pattern — driven by backgroundPositionY in JS */
-    .spr-strip-holes {
-      position: absolute; inset: 0;
-      background-repeat: repeat-y;
-      background-size: 100% 38px;   /* one hole every 38px */
-      /* SVG tile: dark frame + darker hole */
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='38'%3E%3Crect width='32' height='38' fill='%230e0e0e'/%3E%3Crect x='7' y='6' width='18' height='26' rx='3' fill='%23050505'/%3E%3C/svg%3E");
-    }
-
-    /* ══════════════════════════════════
-       STAGE
-    ══════════════════════════════════ */
-    .stage {
+    #timeline {
       position: fixed;
       top: var(--topH);
-      left: var(--spr);          /* inset for sprocket strips */
-      right: var(--spr);
-      bottom: var(--footH);
-      display: flex;
-      gap: 0;
-      overflow: hidden;
-    }
-
-    /* Thin amber centre line */
-    .stage::after {
-      content: '';
-      position: absolute;
-      left: 50%; top: 6%; bottom: 6%;
-      width: 1px;
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(200,135,58,.16) 15%,
-        rgba(200,135,58,.16) 85%,
-        transparent 100%
-      );
-      z-index: 100;
-      pointer-events: none;
-    }
-
-    .col {
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-      /* Fade top & bottom into darkness */
-      -webkit-mask-image: linear-gradient(
-        to bottom,
-        transparent 0,
-        black 80px,
-        black calc(100% - 80px),
-        transparent 100%
-      );
-      mask-image: linear-gradient(
-        to bottom,
-        transparent 0,
-        black 80px,
-        black calc(100% - 80px),
-        transparent 100%
-      );
-    }
-
-    .col-track {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;          /* thick film-frame gap between sections */
-      will-change: transform;
-    }
-
-    /* ══════════════════════════════════
-       SECTION CARD
-    ══════════════════════════════════ */
-    .sec-card {
-      position: relative;
-      width: 100%;
-      flex-shrink: 0;
-      overflow: hidden;
-      cursor: pointer;
-      background: #080808;
-      /* height set by JS */
-    }
-
-    /* Blurred background fill — same image, spread to cover, heavily blurred */
-    .sec-bg {
-      position: absolute; inset: -30px;  /* bleed past edges to hide blur fringe */
-      background-size: cover;
-      background-position: center;
-      filter: blur(28px) brightness(.28) saturate(.5);
-      z-index: 0;
-      transition: filter .5s ease;
-    }
-    .sec-card:hover .sec-bg {
-      filter: blur(28px) brightness(.38) saturate(.6);
-    }
-
-    /* Cover media — sits on top of blur, shows full image */
-    .sec-card img,
-    .sec-card video {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      object-fit: contain;          /* full image, no crop */
-      object-position: center center;
-      display: block;
-      z-index: 1;
-      transition: filter .5s ease, transform .6s cubic-bezier(.25,.46,.45,.94);
-      filter: brightness(.82) saturate(.9);
-    }
-    .sec-card:hover img,
-    .sec-card:hover video {
-      filter: brightness(1) saturate(1);
-      transform: scale(1.02);
-    }
-
-    /* Gradient overlay — always present */
-    .sec-card-grad {
-      position: absolute; inset: 0;
-      background: linear-gradient(
-        160deg,
-        rgba(8,8,8,.15) 0%,
-        rgba(8,8,8,.0)  40%,
-        rgba(8,8,8,.72) 100%
-      );
-      z-index: 2;
-      transition: opacity .4s;
-    }
-    .sec-card:hover .sec-card-grad {
-      background: linear-gradient(
-        160deg,
-        rgba(8,8,8,.08) 0%,
-        rgba(8,8,8,.0)  35%,
-        rgba(8,8,8,.78) 100%
-      );
-    }
-
-    /* Text block — frosted bottom strip */
-    .sec-card-text {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      z-index: 3;
-      padding: 48px 28px 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      /* Rich gradient behind text so it always reads over any image */
-      background: linear-gradient(
-        to top,
-        rgba(5,5,5,.88) 0%,
-        rgba(5,5,5,.55) 55%,
-        transparent 100%
-      );
-    }
-
-    .sec-card-label {
-      font-size: .4rem;
-      letter-spacing: .42em;
-      text-transform: uppercase;
-      color: var(--amber);
-      opacity: .9;
-    }
-
-    .sec-card-title {
-      font-family: 'VT323', monospace;
-      font-size: clamp(2rem, 4.5vw, 4rem);
-      letter-spacing: .1em;
-      line-height: 1;
-      color: #fff;
-      text-transform: uppercase;
-      transition: text-shadow .35s;
-    }
-    .sec-card:hover .sec-card-title {
-      text-shadow: 0 2px 28px rgba(200,135,58,.4);
-    }
-
-    .sec-card-meta {
-      font-size: .4rem;
-      letter-spacing: .3em;
-      color: rgba(255,255,255,.28);
-      margin-top: 3px;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity .3s, transform .3s;
-    }
-    .sec-card:hover .sec-card-meta {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Arrow — top-right corner */
-    .sec-card-arrow {
-      position: absolute;
-      top: 18px; right: 22px;
-      z-index: 4;
-      font-size: .42rem;
-      letter-spacing: .22em;
-      color: rgba(255,255,255,.15);
-      opacity: 0;
-      transition: opacity .3s, color .2s;
-    }
-    .sec-card:hover .sec-card-arrow {
-      opacity: 1;
-      color: rgba(255,255,255,.5);
-    }
-
-    /* ══════════════════════════════════
-       SCROLL PROGRESS BAR
-    ══════════════════════════════════ */
-    .prog-bar {
-      position: fixed;
-      bottom: 0; left: 0;
-      height: 2px;
-      background: var(--amber);
-      z-index: 300;
-      width: 0%;
-      transition: width .08s linear;
-      opacity: .7;
-    }
-
-    /* ── Scroll hint — animated arrow ── */
-    .scroll-hint {
-      position: fixed;
-      bottom: 22px;
-      left: 50%; transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 5px;
-      z-index: 300;
-      transition: opacity .6s;
-    }
-    .scroll-hint.hidden { opacity: 0; pointer-events: none; }
-    .scroll-hint-label {
-      font-size: .36rem; letter-spacing: .45em;
-      color: rgba(255,255,255,.18);
-    }
-    .scroll-hint-arrow {
-      width: 18px; height: 18px;
-      border-right: 1px solid rgba(255,255,255,.2);
-      border-bottom: 1px solid rgba(255,255,255,.2);
-      transform: rotate(45deg);
-      animation: arrow-bob .9s ease-in-out infinite alternate;
-    }
-    @keyframes arrow-bob {
-      from { transform: rotate(45deg) translate(0, 0); opacity: .15; }
-      to   { transform: rotate(45deg) translate(3px, 3px); opacity: .45; }
-    }
-
-    /* ── Side nav dots ── */
-    .side-dots {
-      position: fixed;
-      top: 50%; transform: translateY(-50%);
-      z-index: 300;
-      display: flex; flex-direction: column; gap: 10px;
-      align-items: center;
-    }
-    .side-dots.left  { left: 46px; }   /* clear the 32px sprocket strip */
-    .side-dots.right { right: 46px; }
-    .sd {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.15);
-      border: 1px solid rgba(255,255,255,.1);
-      transition: background .3s, transform .3s, border-color .3s;
-      cursor: pointer;
-    }
-    .sd.active {
-      background: var(--amber);
-      border-color: var(--amber);
-      transform: scale(1.45);
-    }
-    .sd-label {
-      position: absolute;
-      font-size: .36rem; letter-spacing: .3em;
-      color: rgba(255,255,255,.22);
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity .2s;
-      pointer-events: none;
-    }
-    .side-dots.left  .sd-label { left: 14px; }
-    .side-dots.right .sd-label { right: 14px; }
-    .sd:hover .sd-label { opacity: 1; }
-
-    /* ══════════════════════════════════
-       GALLERY MODAL (section click)
-    ══════════════════════════════════ */
-    #gal-modal {
-      position: fixed; inset: 0;
-      background: rgba(6,6,6,.98);
-      z-index: 950;
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    #gal-modal.open { display: flex; }
-
-    .gal-header {
-      flex-shrink: 0;
-      height: 58px;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 28px;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    .gal-title {
-      font-family: 'VT323', monospace;
-      font-size: 1.6rem; letter-spacing: .2em;
-      color: rgba(255,255,255,.75);
-    }
-    .gal-close {
-      background: none; border: none; cursor: pointer;
-      font-size: .6rem; letter-spacing: .28em;
-      color: rgba(255,255,255,.28);
-      font-family: 'Share Tech Mono', monospace;
-      transition: color .2s;
-      padding: 0;
-    }
-    .gal-close:hover { color: #fff; }
-
-    .gal-grid {
-      flex: 1;
+      bottom: var(--botH);
+      left: 0; right: 0;
       overflow-y: auto;
-      padding: 18px 20px 24px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 8px;
-      align-content: start;
-      scrollbar-width: thin;
-      scrollbar-color: #222 transparent;
+      overflow-x: hidden;
     }
-    .gal-grid::-webkit-scrollbar { width: 4px; }
-    .gal-grid::-webkit-scrollbar-thumb { background: #333; }
+    #timeline::-webkit-scrollbar { width: 4px; }
+    #timeline::-webkit-scrollbar-track { background: transparent; }
+    #timeline::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.18); border-radius: 2px; }
 
-    /* gallery card */
-    .gal-item {
-      position: relative;
-      aspect-ratio: 16/10;
-      overflow: hidden;
-      cursor: pointer;
-      background: #111;
+    /* Track */
+    .track {
+      display: flex;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      min-height: calc(var(--clipH) + 24px);
     }
-    .gal-item img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      transition: transform .5s, filter .3s;
-      filter: brightness(.82);
+    .track:first-child { border-top: 1px solid rgba(255,255,255,0.05); }
+    .track.hidden { display: none; }
+
+    /* Track label column */
+    .track-head {
+      flex-shrink: 0;
+      width: var(--labelW);
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 10px 14px;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      background: rgba(0,0,0,0.25);
+      position: sticky; left: 0;
     }
-    .gal-item:hover img { transform: scale(1.05); filter: brightness(1); }
-    .gal-item-info {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      justify-content: flex-end;
-      padding: 10px 12px;
-      background: linear-gradient(to top, rgba(0,0,0,.75) 0%, transparent 55%);
-      opacity: 0; transition: opacity .3s;
+    .track-indicator {
+      display: flex; align-items: center; gap: 7px;
+      margin-bottom: 4px;
     }
-    .gal-item:hover .gal-item-info { opacity: 1; }
-    .gal-item-title {
+    .track-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .track-cat {
+      font-size: .55rem;
+      letter-spacing: .14em;
+      color: var(--dim);
+    }
+    .track-name {
       font-family: 'VT323', monospace;
-      font-size: 1rem; letter-spacing: .06em;
-      color: #fff; line-height: 1;
+      font-size: 1.05rem;
+      letter-spacing: .12em;
+      color: var(--text);
+      line-height: 1;
     }
-    .gal-item-play {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity .3s;
+    .track-count {
+      font-size: .5rem;
+      color: var(--dim);
+      margin-top: 3px;
+      letter-spacing: .08em;
     }
-    .gal-item-play::after {
+
+    /* Left accent bar on track */
+    .track::before {
       content: '';
-      border-left: 14px solid rgba(255,255,255,.85);
-      border-top: 9px solid transparent;
-      border-bottom: 9px solid transparent;
-      margin-left: 4px;
+      flex-shrink: 0;
+      width: 3px;
+      align-self: stretch;
     }
-    .gal-item:hover .gal-item-play { opacity: 1; }
-    .gal-hs-badge {
-      position: absolute; top: 8px; left: 8px;
-      background: #FF7A59; color: #fff;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: .4rem; letter-spacing: .18em;
-      padding: 3px 7px 2px;
-      text-transform: uppercase;
-      z-index: 2; pointer-events: none;
-    }
-    .gal-item-ext {
-      position: absolute; top: 8px; right: 8px;
-      background: rgba(0,0,0,0.72);
-      color: rgba(210,205,185,0.9);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: .65rem; letter-spacing: .05em;
-      padding: 3px 7px 2px;
-      z-index: 2; pointer-events: none;
-      transition: opacity 0.15s;
-    }
-    .gal-item:hover .gal-item-ext { opacity: 1; }
+    .track[data-cat="documentary"]::before { background: var(--doc); }
+    .track[data-cat="podcast"]::before     { background: var(--pod); }
+    .track[data-cat="brand"]::before       { background: var(--brand); }
+    .track[data-cat="film"]::before        { background: var(--film); }
+    .track[data-cat="photography"]::before { background: var(--photo); }
 
-    /* ══════════════════════════════════
-       VIDEO MODAL
-    ══════════════════════════════════ */
-    #vid-modal {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.97);
-      z-index: 1000;
-      display: none;
-      align-items: center; justify-content: center; flex-direction: column;
-      gap: 14px;
-    }
-    #vid-modal.open { display: flex; }
-    #vid-close {
-      align-self: flex-end; margin-right: 5vw;
-      font-size: .6rem; letter-spacing: .3em;
-      color: rgba(255,255,255,.3); cursor: pointer;
-      background: none; border: none;
-      font-family: 'Share Tech Mono', monospace;
-      transition: color .2s;
-    }
-    #vid-close:hover { color: #fff; }
-    #vid-player {
-      width: 88vw; max-width: 1200px;
-      max-height: 80vh;
-      display: block;
-    }
-    #vid-caption {
-      font-size: .52rem; letter-spacing: .32em;
-      color: rgba(255,255,255,.22);
+    /* Clips area */
+    .track-body {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 6px;
+      padding: 12px 14px;
+      overflow: visible;
     }
 
-    /* ══════════════════════════════════
-       LIGHTBOX
-    ══════════════════════════════════ */
-    #lightbox {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.97);
-      z-index: 1000;
-      display: none;
-      align-items: center; justify-content: center;
+    /* Clip block */
+    .clip {
+      position: relative;
+      width: var(--clipW);
+      height: var(--clipH);
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: var(--surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      transition: background .15s, border-color .15s, transform .12s;
+      overflow: visible;
     }
-    #lightbox.open { display: flex; }
-    #lb-wrap {
-      width: 92vw; max-width: 1100px;
-      max-height: 94vh;
-      display: flex; flex-direction: column; gap: 12px;
+    .clip:hover {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(255,255,255,0.16);
+      transform: translateY(-1px);
+      z-index: 100;
     }
-    #lb-bar {
-      display: flex; align-items: center; justify-content: space-between;
+    /* Colored left stripe */
+    .clip::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 3px; bottom: 3px;
+      width: 3px;
+      border-radius: 2px 0 0 2px;
     }
-    #lb-name { font-size: .54rem; letter-spacing: .35em; color: rgba(255,255,255,.28); }
-    #lb-x {
-      font-size: .6rem; letter-spacing: .3em;
-      color: rgba(255,255,255,.3); cursor: pointer;
-      background: none; border: none;
-      font-family: 'Share Tech Mono', monospace;
-      transition: color .2s;
-    }
-    #lb-x:hover { color: #fff; }
-    #lb-img-wrap {
-      flex: 1; overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
-      min-height: 0;
-    }
-    #lb-img { max-width: 100%; max-height: 68vh; object-fit: contain; display: block; }
-    #lb-foot {
-      display: flex; align-items: center; justify-content: center; gap: 24px;
-    }
-    .lb-nav-btn {
-      font-size: .52rem; letter-spacing: .35em;
-      color: rgba(255,255,255,.3); cursor: pointer;
-      background: none; border: none;
-      font-family: 'Share Tech Mono', monospace;
-      transition: color .2s;
-    }
-    .lb-nav-btn:hover { color: #fff; }
-    #lb-num { font-size: .48rem; letter-spacing: .28em; color: rgba(255,255,255,.15); }
-    #lb-thumbs {
-      display: flex; gap: 4px; overflow-x: auto;
-      padding: 3px 0 2px;
-      scrollbar-width: thin; scrollbar-color: #333 transparent;
-    }
-    #lb-thumbs::-webkit-scrollbar { height: 2px; }
-    #lb-thumbs::-webkit-scrollbar-thumb { background: #333; }
-    .lb-t {
-      flex-shrink: 0; width: 52px; height: 36px;
-      object-fit: cover; cursor: pointer;
-      opacity: .28; border: 1px solid transparent;
-      transition: opacity .15s, border-color .15s;
-    }
-    .lb-t.on { opacity: 1; border-color: var(--amber); }
-    .lb-t:hover { opacity: .65; }
+    .clip[data-cat="documentary"]::before { background: var(--doc); }
+    .clip[data-cat="podcast"]::before     { background: var(--pod); }
+    .clip[data-cat="brand"]::before       { background: var(--brand); }
+    .clip[data-cat="film"]::before        { background: var(--film); }
+    .clip[data-cat="photography"]::before { background: var(--photo); }
 
-    /* ── FOOTER NAV ── */
-    #works-footer {
+    .clip-title {
+      font-size: .6rem;
+      letter-spacing: .06em;
+      color: rgba(216,212,188,0.78);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-left: 8px;
+      line-height: 1.3;
+    }
+    .clip-format {
+      font-size: .48rem;
+      color: var(--dim);
+      letter-spacing: .05em;
+      padding-left: 8px;
+      margin-top: 2px;
+    }
+    .clip-inner {
+      display: flex; flex-direction: column;
+      overflow: hidden; width: 100%;
+    }
+
+    /* ── Preview card (fixed, JS-positioned) ── */
+    #preview-card {
       position: fixed;
-      bottom: 0; left: var(--spr); right: var(--spr);
-      height: var(--footH);
-      display: flex; align-items: center; justify-content: center;
-      gap: clamp(24px, 7vw, 64px);
-      background: rgba(8,8,8,.95);
-      border-top: 1px solid rgba(200,135,58,.12);
-      z-index: 160;
+      z-index: 8000;
+      min-width: 220px; max-width: 270px;
+      background: rgba(10,10,10,0.97);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-top: 2px solid var(--preview-accent, var(--amber));
+      border-radius: 3px;
+      padding: 12px 14px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .12s;
+      backdrop-filter: blur(12px);
     }
-    #works-footer a {
+    #preview-card.visible { opacity: 1; }
+    .pv-title {
       font-family: 'VT323', monospace;
-      font-size: clamp(1.6rem, 3.2vw, 2.6rem);
-      letter-spacing: 0.12em;
-      color: rgba(210,205,185,0.55);
-      text-shadow: -1px 0 rgba(255,40,40,0.3), 1px 0 rgba(40,220,255,0.3);
-      transition: color 0.15s, text-shadow 0.15s, transform 0.15s;
-      padding: 2px 4px; text-decoration: none; display: inline-block;
+      font-size: 1.15rem;
+      letter-spacing: .1em;
+      color: var(--text);
+      margin-bottom: 6px;
+      line-height: 1.1;
     }
-    #works-footer a:hover {
-      color: #fff;
-      text-shadow:
-        -3px 0 rgba(255,40,40,0.85),
-         3px 0 rgba(40,220,255,0.85),
-         0 0 18px rgba(255,245,200,0.85),
-         0 0 40px rgba(220,200,120,0.45);
-      transform: scale(1.08);
+    .pv-meta {
+      font-size: .52rem;
+      letter-spacing: .1em;
+      color: var(--dim);
+      margin-bottom: 8px;
     }
-    #works-footer a:active { transform: scale(0.96); }
+    .pv-desc {
+      font-size: .55rem;
+      letter-spacing: .04em;
+      color: rgba(216,212,188,0.6);
+      line-height: 1.55;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 8px;
+    }
+
+    /* ══════════════════════════════════
+       STATUS BAR
+    ══════════════════════════════════ */
+    #statusbar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: var(--botH);
+      z-index: 300;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 18px;
+      background: rgba(8,8,8,.97);
+      border-top: 1px solid var(--border);
+      font-size: .55rem;
+      letter-spacing: .1em;
+      color: var(--dim);
+    }
+    #statusbar-left { display: flex; align-items: center; gap: 20px; }
+    #clip-count { color: var(--amber); }
+    .sb-nav { display: flex; gap: 16px; }
+    .sb-nav a {
+      color: var(--dim);
+      text-decoration: none;
+      letter-spacing: .1em;
+      font-size: .55rem;
+      transition: color .14s;
+    }
+    .sb-nav a:hover { color: var(--text); }
 
   </style>
 </head>
 <body>
 
-  <div class="grain" aria-hidden="true"></div>
-  <div id="flash" aria-hidden="true"></div>
+  <div class="grain"></div>
+  <div id="flash"></div>
 
-  <!-- VIDEO MODAL -->
-  <div id="vid-modal" role="dialog">
-    <button id="vid-close">[ CLOSE ]</button>
-    <video id="vid-player" controls playsinline></video>
-    <span id="vid-caption"></span>
+  <!-- ── TOOLBAR ── -->
+  <div id="toolbar">
+    <div id="toolbar-left">
+      <span id="page-title">WORKS</span>
+    </div>
+
+    <div id="filters">
+      <button class="filter-btn active" data-filter="all">
+        <span class="cat-dot dot-all"></span>ALL
+      </button>
+      <button class="filter-btn" data-filter="documentary">
+        <span class="cat-dot dot-doc"></span>DOCUMENTARY
+      </button>
+      <button class="filter-btn" data-filter="podcast">
+        <span class="cat-dot dot-pod"></span>PODCAST
+      </button>
+      <button class="filter-btn" data-filter="brand">
+        <span class="cat-dot dot-brand"></span>BRAND FILM
+      </button>
+      <button class="filter-btn" data-filter="film">
+        <span class="cat-dot dot-film"></span>FILM
+      </button>
+      <button class="filter-btn" data-filter="photography">
+        <span class="cat-dot dot-photo"></span>PHOTOGRAPHY
+      </button>
+    </div>
+
+    <nav id="toolbar-nav">
+      <a class="nav-link" href="index.html">○ HOME</a>
+      <a class="nav-link" href="about.html">◄◄ ABOUT</a>
+      <a class="nav-link" href="contact.html">CONTACT ■</a>
+    </nav>
   </div>
 
-  <!-- LIGHTBOX -->
-  <div id="lightbox" role="dialog">
-    <div id="lb-wrap">
-      <div id="lb-bar">
-        <span id="lb-name"></span>
-        <button id="lb-x">[ CLOSE ]</button>
+  <!-- ── TIMELINE ── -->
+  <div id="timeline">
+
+    <!-- DOCUMENTARY -->
+    <div class="track" data-cat="documentary">
+      <div class="track-head">
+        <div class="track-indicator">
+          <div class="track-dot" style="background:var(--doc)"></div>
+          <span class="track-cat">TRACK 01</span>
+        </div>
+        <div class="track-name">DOCUMENTARY</div>
+        <div class="track-count" id="count-documentary"></div>
       </div>
-      <div id="lb-img-wrap">
-        <img id="lb-img" src="" alt="">
+      <div class="track-body" id="body-documentary"></div>
+    </div>
+
+    <!-- PODCAST -->
+    <div class="track" data-cat="podcast">
+      <div class="track-head">
+        <div class="track-indicator">
+          <div class="track-dot" style="background:var(--pod)"></div>
+          <span class="track-cat">TRACK 02</span>
+        </div>
+        <div class="track-name">PODCAST</div>
+        <div class="track-count" id="count-podcast"></div>
       </div>
-      <div id="lb-foot">
-        <button class="lb-nav-btn" id="lb-prev">← PREV</button>
-        <span id="lb-num"></span>
-        <button class="lb-nav-btn" id="lb-next">NEXT →</button>
+      <div class="track-body" id="body-podcast"></div>
+    </div>
+
+    <!-- BRAND FILM -->
+    <div class="track" data-cat="brand">
+      <div class="track-head">
+        <div class="track-indicator">
+          <div class="track-dot" style="background:var(--brand)"></div>
+          <span class="track-cat">TRACK 03</span>
+        </div>
+        <div class="track-name">BRAND FILM</div>
+        <div class="track-count" id="count-brand"></div>
       </div>
-      <div id="lb-thumbs"></div>
+      <div class="track-body" id="body-brand"></div>
+    </div>
+
+    <!-- FILM -->
+    <div class="track" data-cat="film">
+      <div class="track-head">
+        <div class="track-indicator">
+          <div class="track-dot" style="background:var(--film)"></div>
+          <span class="track-cat">TRACK 04</span>
+        </div>
+        <div class="track-name">FILM</div>
+        <div class="track-count" id="count-film"></div>
+      </div>
+      <div class="track-body" id="body-film"></div>
+    </div>
+
+    <!-- PHOTOGRAPHY -->
+    <div class="track" data-cat="photography">
+      <div class="track-head">
+        <div class="track-indicator">
+          <div class="track-dot" style="background:var(--photo)"></div>
+          <span class="track-cat">TRACK 05</span>
+        </div>
+        <div class="track-name">PHOTOGRAPHY</div>
+        <div class="track-count" id="count-photography"></div>
+      </div>
+      <div class="track-body" id="body-photography"></div>
+    </div>
+
+  </div>
+
+  <!-- ── PREVIEW CARD ── -->
+  <div id="preview-card">
+    <div class="pv-title" id="pv-title"></div>
+    <div class="pv-meta"  id="pv-meta"></div>
+    <div class="pv-desc"  id="pv-desc"></div>
+  </div>
+
+  <!-- ── STATUS BAR ── -->
+  <div id="statusbar">
+    <div id="statusbar-left">
+      <span id="clip-count">— CLIPS</span>
+      <span>© 2018 – PRESENT · ANURAGINI MEDIGA</span>
+    </div>
+    <div class="sb-nav">
+      <a href="index.html">○ HOME</a>
+      <a href="about.html">◄◄ ABOUT</a>
+      <a href="contact.html">CONTACT ■</a>
     </div>
   </div>
-
-  <!-- GALLERY MODAL -->
-  <div id="gal-modal" role="dialog">
-    <div class="gal-header">
-      <span class="gal-title" id="gal-title"></span>
-      <button class="gal-close" id="gal-close">[ CLOSE ]</button>
-    </div>
-    <div class="gal-grid" id="gal-grid"></div>
-  </div>
-
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <span class="topbar-logo">WORKS</span>
-  </div>
-
-  <!-- SPROCKET STRIPS -->
-  <div class="spr-strip left"  id="spr-left">
-    <div class="spr-strip-holes" id="spr-left-holes"></div>
-  </div>
-  <div class="spr-strip right" id="spr-right">
-    <div class="spr-strip-holes" id="spr-right-holes"></div>
-  </div>
-
-  <!-- STAGE -->
-  <div class="stage" id="stage">
-    <div class="col col-left"  id="col-left">
-      <div class="col-track" id="track-left"></div>
-    </div>
-    <div class="col col-right" id="col-right">
-      <div class="col-track" id="track-right"></div>
-    </div>
-  </div>
-
-  <!-- UI CHROME -->
-  <div class="prog-bar" id="prog-bar"></div>
-
-  <div class="scroll-hint" id="scroll-hint">
-    <span class="scroll-hint-label">SCROLL</span>
-    <div class="scroll-hint-arrow"></div>
-  </div>
-
-  <!-- Side nav dots: left column -->
-  <div class="side-dots left" id="sdl"></div>
-  <!-- Side nav dots: right column -->
-  <div class="side-dots right" id="sdr"></div>
 
   <script>
   (() => {
     'use strict';
 
-    /* ────────────────────────────────────────────
-       FILE PATH HELPER
-    ──────────────────────────────────────────── */
-    const W = 'Works%20/';
-    function enc(s) {
-      return [...s].map(c =>
-        c === ' ' ? '%20' : c === ':' ? '%3A' : c === ',' ? '%2C' : c
-      ).join('');
-    }
-    function p(...parts) { return parts.map(enc).join('/'); }
+    /* ── Project data ─────────────────────────────────────────────────────── */
+    const PROJECTS = {
+      documentary: [
+        { title: 'Stories Under the Street', year: '2024', format: '4K · DOCUMENTARY', desc: 'A short documentary following NYC subway musicians — their craft, their stories, their underground world.', link: 'https://vimeo.com/1157423699' },
+        { title: 'Beyond the Bustle',         year: '2024', format: 'HD · DOCUMENTARY SERIES', desc: 'Urban life in New York City through the lens of people who live it daily — unscripted, unfiltered.', link: 'https://www.youtube.com/watch?v=T_DnbCLHHUU' },
+        { title: 'Silent Film Score',         year: '2023', format: 'HD · SHORT DOC', desc: 'An experimental silent film scored and edited as a study in visual rhythm and motion.' },
+      ],
+      podcast: [
+        { title: 'Ambo Podcast',              year: '2025', format: 'SERIES · VIDEO PODCAST', desc: 'Produced and edited a multi-episode video podcast series exploring culture and identity.', link: 'https://www.youtube.com/watch?v=CtgFnzhWAwM' },
+        { title: 'Gen Alpha',                 year: '2025', format: 'SERIES · PODCAST', desc: 'A podcast series studying the media habits and cultural identity of Gen Alpha.', link: 'https://www.youtube.com/watch?v=CtgFnzhWAwM' },
+        { title: 'Beyond the Bustle',         year: '2024', format: 'PODCAST SERIES', desc: 'Companion podcast series to the documentary — extended conversations with NYC residents.', link: 'https://www.youtube.com/watch?v=T_DnbCLHHUU' },
+      ],
+      brand: [
+        { title: 'Kled AI — Promo',           year: '2024', format: '4K · BRAND FILM', desc: 'Brand launch promo for an AI startup — scripted, directed, and edited end to end.' },
+        { title: 'Kled AI — Update',          year: '2024', format: '4K · BRAND VIDEO', desc: 'Follow-up product update video for Kled AI — motion graphics and VO integration.' },
+        { title: 'P-tal Bottler Ad',          year: '2023', format: '4K · COMMERCIAL', desc: 'Product commercial for P-tal handcrafted bottlleware — shot on location in India.' },
+        { title: 'Oases',                     year: '2023', format: '4K · BRAND FILM', desc: 'Brand film for Oases — lifestyle and identity storytelling for an emerging brand.' },
+        { title: 'Brand Innovators I',        year: '2024', format: 'EVENT CONTENT', desc: 'Executive video content for the Brand Innovators summit.', link: 'https://brand-innovators.com/video-content/#/channel/7125' },
+        { title: 'Brand Innovators II',       year: '2024', format: 'EVENT CONTENT', desc: 'Second episode of executive roundtable content for Brand Innovators.', link: 'https://brand-innovators.com/video-content/#/channel/7152' },
+        { title: 'HubSpot HtH #037',          year: '2024', format: 'YOUTUBE · SERIES', desc: 'Episode 037 of HubSpot\'s How to Help series — produced and edited for YouTube.', link: 'https://www.youtube.com/watch?v=AiEW9w0jwHI' },
+        { title: 'HubSpot HtH #038',          year: '2024', format: 'YOUTUBE · SERIES', desc: 'Episode 038 — HubSpot How to Help. End-to-end post production.', link: 'https://www.youtube.com/watch?v=dYajvFxDODw' },
+        { title: 'HubSpot HtH #039',          year: '2024', format: 'YOUTUBE · SERIES', desc: 'Episode 039 — HubSpot How to Help. Colour graded and delivered in 4K.', link: 'https://www.youtube.com/watch?v=DUwEovgjDA8' },
+        { title: 'HubSpot HtH #040',          year: '2024', format: 'YOUTUBE · SERIES', desc: 'Episode 040 — HubSpot How to Help series. Motion and editorial.', link: 'https://www.youtube.com/watch?v=Maho5Dv-J4g' },
+        { title: 'HubSpot HtH #041',          year: '2024', format: 'YOUTUBE · SERIES', desc: 'Episode 041 — editing, color, and delivery for HubSpot How to Help.', link: 'https://www.youtube.com/watch?v=_ix5Y8c6n0o' },
+        { title: 'HubSpot HtH #042',          year: '2024', format: 'YOUTUBE · SERIES', desc: 'Episode 042 — full post production for HubSpot\'s ongoing series.', link: 'https://www.youtube.com/watch?v=BbDWuPPzMU8' },
+        { title: 'HubSpot HtH #044',          year: '2024', format: 'YOUTUBE · SERIES', desc: 'Episode 044 — HubSpot How to Help. Final episode in the current run.', link: 'https://www.youtube.com/watch?v=kWp3m9Eops4' },
+        { title: 'Arcesium — Travel Brief',   year: '2023', format: 'CORPORATE VIDEO', desc: 'Internal travel briefing video for Arcesium — scripted, shot and edited for U.S. audience.' },
+      ],
+      film: [
+        { title: 'Night of Melancholia',       year: '2023', format: '4K · SHORT FILM', desc: 'A contemplative short film exploring grief and solitude through visual poetry. Directed & edited.' },
+        { title: 'REM',                        year: '2024', format: '4K · SHORT FILM', desc: 'A surrealist short following a character through the threshold of sleep and waking.' },
+        { title: 'Somewhere Nowhere',          year: '2023', format: 'HD · SHORT FILM', desc: 'Road film — a meditative journey across unfamiliar terrain. Directed, shot, edited.' },
+        { title: 'The Building Blocks',        year: '2022', format: 'HD · SHORT FILM', desc: 'A short film about construction, identity and the structures we build around ourselves.' },
+        { title: 'MOSAIC',                     year: '2024', format: '4K · EXPERIMENTAL', desc: 'An experimental edit weaving multiple narrative threads into a fragmented portrait.' },
+        { title: 'Nightmare',                  year: '2024', format: '4K · SHORT FILM', desc: 'A psychological short with practical effects and heightened sound design.' },
+        { title: 'OONO',                       year: '2024', format: '4K · NARRATIVE', desc: 'A quiet narrative film about language, belonging, and displacement.' },
+        { title: 'Sensitive Content',          year: '2023', format: 'HD · SHORT FILM', desc: 'A film exploring digital identity and what we choose to reveal or conceal online.' },
+        { title: 'Threshold',                  year: '2023', format: '4K · SHORT FILM', desc: 'Threshold follows a character at the edge of a major life decision — still and observational.' },
+        { title: 'Unraveled',                  year: '2024', format: '4K · SHORT FILM', desc: 'A film about the slow dissolution of a relationship — told through objects and space.' },
+        { title: 'Sugar',                      year: '2024', format: '4K · SHORT FILM', desc: 'A visually driven short — part narrative, part essay — on sweetness and excess.' },
+        { title: 'Music Video',                year: '2024', format: '4K · MUSIC VIDEO', desc: 'Original music video — concept, direction, and edit. Colour graded in DaVinci Resolve.' },
+        { title: 'EUSEXUA — BTS Edit',         year: '2025', format: '4K · FAN EDIT', desc: 'Behind-the-scenes edit inspired by FKA twigs\' EUSEXUA era. Rhythm-based cut.' },
+        { title: 'EUSEXUA — Trailer',          year: '2025', format: '4K · FAN EDIT', desc: 'Trailer-style fan edit for FKA twigs\' EUSEXUA — atmospheric and kinetic.' },
+        { title: 'Low-key Lighting',           year: '2023', format: 'HD · STUDY', desc: 'A cinematography study in low-key lighting techniques. Shot and edited independently.' },
+        { title: 'Pink Visual — BTS',          year: '2024', format: '4K · BTS EDIT', desc: 'Behind-the-scenes edit from a Pink Visual production — fast-paced editorial cut.' },
+        { title: 'Pink Visual Trailer',        year: '2024', format: '4K · TRAILER', desc: 'Trailer cut for Pink Visual — grade and sound mix done in-house.' },
+        { title: 'Surfing Promo',              year: '2023', format: 'HD · PROMO', desc: 'Action sports promo edit — fast cuts, music-driven, colour-popped grade.' },
+      ],
+      photography: [
+        { title: 'Book Launch · NYC · 2024',   year: '2024', format: 'EVENT PHOTOGRAPHY', desc: 'Event coverage of a New York book launch — candid portraits and editorial stills.' },
+        { title: 'LatinX Storytelling 2025',   year: '2025', format: 'CONFERENCE · EDITORIAL', desc: 'Photography coverage of the LatinX Storytelling Conference 2025, New York.' },
+        { title: 'MET · NYC · 2025',           year: '2025', format: 'FINE ART · EDITORIAL', desc: 'Architectural and portrait photography inside the Metropolitan Museum of Art.' },
+        { title: 'New York City',              year: '2023', format: 'STREET PHOTOGRAPHY', desc: 'An ongoing street photography series documenting life in New York City.' },
+        { title: 'NY Fashion Week 2025',       year: '2025', format: 'FASHION · EDITORIAL', desc: 'Runway and backstage photography from New York Fashion Week, Spring 2025.' },
+        { title: 'Hyderabad',                  year: '2022', format: 'STREET · DOCUMENTARY', desc: 'Street photography from Hyderabad, India — people, texture, light.' },
+        { title: 'Portraits',                  year: '2023', format: 'PORTRAIT SERIES', desc: 'A studio and location portrait series — directional light, minimal styling.' },
+        { title: 'Tirupati',                   year: '2022', format: 'DOCUMENTARY · TRAVEL', desc: 'Documentary photography from Tirupati — pilgrimage, devotion, and stillness.' },
+        { title: 'Vellorex — Product',         year: '2023', format: 'PRODUCT PHOTOGRAPHY', desc: 'Commercial product photography for Vellorex — clean studio setup, styled compositions.' },
+      ]
+    };
 
-    /* ────────────────────────────────────────────
-       VIDEO FRAME EXTRACTOR
-    ──────────────────────────────────────────── */
-    const q = []; let busy = false;
+    /* Category accent map */
+    const ACCENTS = {
+      documentary: 'var(--doc)',
+      podcast:     'var(--pod)',
+      brand:       'var(--brand)',
+      film:        'var(--film)',
+      photography: 'var(--photo)'
+    };
 
-    function extractFrame(src, imgEl) {
-      q.push({ src, imgEl });
-      if (!busy) runQ();
-    }
-    function runQ() {
-      if (!q.length) { busy = false; return; }
-      busy = true;
-      const { src, imgEl } = q.shift();
-      const vid = document.createElement('video');
-      vid.muted = true; vid.preload = 'auto'; vid.crossOrigin = 'anonymous';
-      Object.assign(vid.style, { position:'fixed', left:'-9999px', top:'-9999px', width:'1px', height:'1px' });
-      document.body.appendChild(vid);
-      const die = () => { try { vid.src=''; vid.remove(); } catch(e){} runQ(); };
-      const t = setTimeout(die, 8000);
-      vid.addEventListener('seeked', () => {
-        clearTimeout(t);
-        try {
-          const cv = document.createElement('canvas');
-          cv.width = vid.videoWidth||320; cv.height = vid.videoHeight||180;
-          cv.getContext('2d').drawImage(vid, 0, 0, cv.width, cv.height);
-          imgEl.src = cv.toDataURL('image/jpeg', .85);
-        } catch(e) {}
-        die();
-      }, { once: true });
-      vid.addEventListener('error', () => { clearTimeout(t); die(); }, { once: true });
-      vid.addEventListener('loadedmetadata', () => {
-        vid.currentTime = Math.min(1.5, vid.duration > 0 ? vid.duration * .08 : 1.5);
-      }, { once: true });
-      vid.src = src; vid.load();
-    }
+    /* ── Build clips ──────────────────────────────────────────────────────── */
+    let totalClips = 0;
 
-    /* ────────────────────────────────────────────
-       6 SECTIONS DATA
-    ──────────────────────────────────────────── */
-    const SECTIONS = [
-      /* ── LEFT COLUMN (index 0,1,2) ── */
-      {
-        id: 'brands',
-        col: 'left',
-        title: 'Branding & Ads',
-        label: 'Commercial',
-        coverType: 'image',
-        cover: W + p('Brands : Advertising','HubSpot','037-HtH_THUMBNAIL .jpg'),
-        count: 13,
-        items: [
-          { title:'Kled AI — Promo',      type:'video', src: W + p('Brands : Advertising','Kled AI_Promo.mp4') },
-          { title:'Kled AI — Update',     type:'video', src: W + p('Brands : Advertising','Kled AI_Update Video.mp4') },
-          { title:'P-tal Bottler Ad',     type:'video', src: W + p('Brands : Advertising','P-tal Bottler Ad.mp4') },
-          { title:'Oases',                type:'video', src: W + p('Brands : Advertising','oases.mp4') },
-          { title:'Brand Innovators I',   type:'image', src: W + p('Brands : Advertising','Brand Innovators_1.png'),             link:'https://brand-innovators.com/video-content/#/channel/7125' },
-          { title:'Brand Innovators II',  type:'image', src: W + p('Brands : Advertising','Brand Innovators_2.png'),             link:'https://brand-innovators.com/video-content/#/channel/7152' },
-          { title:'HubSpot HtH #037',     type:'image', src: W + p('Brands : Advertising','HubSpot','037-HtH_THUMBNAIL .jpg'),   badge:'HubSpot', link:'https://www.youtube.com/watch?v=AiEW9w0jwHI&t=3s' },
-          { title:'HubSpot HtH #038',     type:'image', src: W + p('Brands : Advertising','HubSpot','038-HtH_THUMBNAIL.jpg'),    badge:'HubSpot', link:'https://www.youtube.com/watch?v=dYajvFxDODw' },
-          { title:'HubSpot HtH #039',     type:'image', src: W + p('Brands : Advertising','HubSpot','039-HtH_THUMBNAIL.jpg.png'),badge:'HubSpot', link:'https://www.youtube.com/watch?v=DUwEovgjDA8&t=11s' },
-          { title:'HubSpot HtH #040',     type:'image', src: W + p('Brands : Advertising','HubSpot','040-HtH_THUMBNAIL.jpg'),    badge:'HubSpot', link:'https://www.youtube.com/watch?v=Maho5Dv-J4g' },
-          { title:'HubSpot HtH #041',     type:'image', src: W + p('Brands : Advertising','HubSpot','041-HtH_THUMBNAIL.jpg'),    badge:'HubSpot', link:'https://www.youtube.com/watch?v=_ix5Y8c6n0o' },
-          { title:'HubSpot HtH #042',     type:'image', src: W + p('Brands : Advertising','HubSpot','042-HtH_THUMBNAIL.png'),    badge:'HubSpot', link:'https://www.youtube.com/watch?v=BbDWuPPzMU8&t=4s' },
-          { title:'HubSpot HtH #044',     type:'image', src: W + p('Brands : Advertising','HubSpot','044-HtH_THUMBNAIL.png'),    badge:'HubSpot', link:'https://www.youtube.com/watch?v=kWp3m9Eops4&t=8s' },
-        ],
-      },
-      {
-        id: 'photo',
-        col: 'left',
-        title: 'Photography',
-        label: 'Still Work',
-        coverType: 'image',
-        cover: W + p('Photography','New York Fashion Week 2025','AEAA5A42-3395-45D9-B516-C55806E7C03B-export.JPG'),
-        count: 9,
-        items: [
-          { title:'Book Launch · NYC · 2024',     type:'album', cover: W+p('Photography','Book Launch Event, New York, 2024','LWH00006.JPG'),           album:{ name:'Book Launch Event · New York · 2024',     folder:W+p('Photography','Book Launch Event, New York, 2024'),          photos:['LWH00006.JPG','LWH00010.JPG','LWH00018.JPG','LWH00158.JPG','LWH00307.JPG','LWH00345.JPG','LWH00357.JPG','LWH00432.JPG','LWH00442.JPG','LWH00646.JPG','LWH00720.JPG','LWH00748.JPG']}},
-          { title:'LatinX Storytelling · 2025',   type:'album', cover: W+p('Photography','LatinX Storytelling Conference 2025','DSC00237.JPG'),          album:{ name:'LatinX Storytelling Conference · 2025',    folder:W+p('Photography','LatinX Storytelling Conference 2025'),        photos:['DSC00237.JPG','DSC00356.JPG','DSC00477.JPG','DSC00494.JPG','DSC01787.JPG','DSC01881.JPG','DSC01889.JPG','DSC01977.JPG']}},
-          { title:'MET · NYC · 2025',             type:'album', cover: W+p('Photography','MET, NYC - 2025','IMG_7417.JPG'),                              album:{ name:'MET · New York City · 2025',               folder:W+p('Photography','MET, NYC - 2025'),                            photos:['IMG_7417.JPG','IMG_7427.JPG','IMG_7430.JPG','IMG_7435.JPG','IMG_7439.JPG','IMG_7471.JPG','IMG_7474.JPG','IMG_7480.JPG','IMG_7499.JPG','IMG_7533.JPG','IMG_7602.JPG','IMG_7621.JPG']}},
-          { title:'New York City',                type:'album', cover: W+p('Photography','New York City','DSC06276.jpg'),                                 album:{ name:'New York City',                            folder:W+p('Photography','New York City'),                              photos:['DSC06276.jpg','DSC06322.jpg','DSC06333.jpg','DSC06470.jpg','DSC06472.jpg']}},
-          { title:'NY Fashion Week · 2025',       type:'album', cover: W+p('Photography','New York Fashion Week 2025','AEAA5A42-3395-45D9-B516-C55806E7C03B-export.JPG'), album:{ name:'New York Fashion Week · 2025', folder:W+p('Photography','New York Fashion Week 2025'), photos:['AEAA5A42-3395-45D9-B516-C55806E7C03B-export.JPG','DSC01462.JPG','DSC01494.JPG','DSC01982.JPG','DSC02829.JPG','DSC03939.JPG','DSC03970.JPG','DSC04485.JPG']}},
-          { title:'P-tal · Product Photography',  type:'album', cover: W+p('Photography','P-tal Product Photography','DSC00496.JPG'),                   album:{ name:'P-tal · Product Photography',              folder:W+p('Photography','P-tal Product Photography'),                 photos:['DSC00496.JPG','DSC00501.JPG','DSC00530.JPG','DSC00572.JPG','DSC00614.JPG','DSC00649.JPG','DSC06188.JPG','DSC06190.JPG','DSC06200.JPG','DSC06395.JPG','DSC06402.JPG','DSC06406.JPG','DSC06462.JPG','DSC06463.JPG','DSC06498.JPG','DSC06518.JPG','DSC06548.JPG','DSC06558.JPG','DSC06565.JPG']}},
-          { title:'Portraits',                    type:'album', cover: W+'Photography/Potraits%20/DSC01320.JPG',                                        album:{ name:'Portraits',                                folder:W+'Photography/Potraits%20',                                    photos:['DSC01320.JPG','DSC01328.JPG','DSC01330.JPG','DSC01332.JPG','DSC01335.JPG','DSC01344.JPG','DSC01361.JPG']}},
-          { title:'Culture Tree · Holi · 2025',   type:'album', cover: W+p('Photography','The Culture Tree - Holi - 2025','DSC00380.JPG'),              album:{ name:'The Culture Tree · Holi · 2025',           folder:W+p('Photography','The Culture Tree - Holi - 2025'),             photos:['DSC00380.JPG','DSC00451.JPG','DSC00485.JPG','DSC00643.JPG','DSC00766.JPG','DSC00776.JPG','DSC00791.JPG','DSC00805.JPG','DSC00885.JPG','DSC01117.JPG','DSC01255.JPG','DSC01388.JPG','DSC01477.JPG','DSC01634.JPG','DSC01938.JPG','DSC02125.JPG','DSC02143.JPG','DSC02168.JPG']}},
-          { title:'Vellorex · Product',           type:'album', cover: W+p('Photography','Vellorex, Product Photography','DSC00003.JPG'),               album:{ name:'Vellorex · Product Photography',           folder:W+p('Photography','Vellorex, Product Photography'),             photos:['DSC00003.JPG','DSC00004.JPG','DSC00015.JPG','DSC09827.JPG','DSC09829.JPG']}},
-        ],
-      },
-      {
-        id: 'editing',
-        col: 'left',
-        title: 'Video Editing',
-        label: 'Post Production',
-        coverType: 'video',
-        cover: W + p('Video Editing','SURFING PROMO.mp4'),
-        count: 6,
-        items: [
-          { title:'EUSEXUA — BTS Edit',   type:'video', src: W+p('Video Editing','EUSEXUA BTS EDIT.mp4') },
-          { title:'EUSEXUA — Trailer',    type:'video', src: W+p('Video Editing','EUSEXUA TRAILER EDIT.mp4') },
-          { title:'Low-key Lighting',     type:'video', src: W+'Video%20Editing/Low-key%20lighting%20.mp4' },
-          { title:'Pink Visual — BTS',    type:'video', src: W+p('Video Editing','PINK VISUAL BTS EDIT.mp4') },
-          { title:'Pink Visual Trailer',  type:'video', src: W+p('Video Editing','PINK VISUAL TRAILER EDIT.mp4') },
-          { title:'Surfing Promo',        type:'video', src: W+p('Video Editing','SURFING PROMO.mp4') },
-        ],
-      },
+    Object.entries(PROJECTS).forEach(([cat, projects]) => {
+      const body  = document.getElementById('body-' + cat);
+      const count = document.getElementById('count-' + cat);
+      totalClips += projects.length;
+      count.textContent = projects.length + ' CLIP' + (projects.length !== 1 ? 'S' : '');
 
-      /* ── RIGHT COLUMN (index 3,4,5) - top to bottom → shown bottom-first at scroll=0 ── */
-      {
-        id: 'films',
-        col: 'right',
-        title: 'Feature Films',
-        label: 'Directing / Production',
-        coverType: 'image',
-        cover: W + p('Feature Films','REM_Poster.JPG'),
-        count: 11,
-        items: [
-          { title:'Night of Melancholia', type:'image', src: W+p('Feature Films','Night of Melacholia_poster.jpeg') },
-          { title:'REM',                  type:'image', src: W+p('Feature Films','REM_Poster.JPG') },
-          { title:'Somewhere Nowhere',    type:'image', src: W+p('Feature Films','Somewhere_Nowehre_Poster.PNG') },
-          { title:'The Building Blocks',  type:'image', src: W+p('Feature Films','The Building Blocks of a Bridge_Poster.jpeg') },
-          { title:'MOSAIC',               type:'video', src: W+p('Feature Films','MOSIAC.mp4') },
-          { title:'Music Video',          type:'video', src: W+p('Feature Films','MUSIC VIDEO.mov') },
-          { title:'Nightmare',            type:'video', src: W+p('Feature Films','Nightmare_2024.mp4') },
-          { title:'OONO',                 type:'video', src: W+p('Feature Films','OONO.mp4') },
-          { title:'Sensitive Content',    type:'video', src: W+p('Feature Films','Sensitive Content.mp4') },
-          { title:'Threshold',            type:'video', src: W+p('Feature Films','Threshold.mp4') },
-          { title:'Unraveled',            type:'video', src: W+p('Feature Films','Unraveled - Vidur Bahl_2024.mp4') },
-        ],
-      },
-      {
-        id: 'podcasts',
-        col: 'right',
-        title: 'Podcasts & Docs',
-        label: 'Documentary Work',
-        coverType: 'image',
-        cover: W + 'Podcasts%20%3A%20Documentaries%20/Ambo_Podcast_2025.png',
-        count: 4,
-        items: [
-          { title:'Ambo Podcast 2025',          type:'image', src: W+'Podcasts%20%3A%20Documentaries%20/Ambo_Podcast_2025.png',                  link:'https://www.youtube.com/watch?v=CtgFnzhWAwM' },
-          { title:'Beyond the Bustle',          type:'image', src: W+'Podcasts%20%3A%20Documentaries%20/Beyond%20the%20Bustle.png',                link:'https://www.youtube.com/watch?v=T_DnbCLHHUU' },
-          { title:'Gen Alpha',                  type:'image', src: W+'Podcasts%20%3A%20Documentaries%20/Gen%20Alpha_Podcast.png',                  link:'https://www.youtube.com/watch?v=CtgFnzhWAwM' },
-          { title:'Stories Under the Street',   type:'image', src: W+'Podcasts%20%3A%20Documentaries%20/Stories%20Under%20the%20Street.png',       link:'https://vimeo.com/1157423699' },
-        ],
-      },
-      {
-        id: 'india',
-        col: 'right',
-        title: 'Works from India',
-        label: 'Early Work',
-        coverType: 'image',
-        cover: W + 'Pixelway%20Logo.jpg',
-        count: 8,
-        items: [
-          { title:'Arcesium — U.S. Travel Briefing', type:'video', src: W+p('Past Work from India','ARCESIUM_U.S. TRAVEL_BRIEFING.mp4') },
-          { title:'Silent Film Score',               type:'video', src: W+p('Feature Films','Anuragini - SILENT FILM SCORE.mov') },
-          { title:'MOSAIC',                          type:'video', src: W+p('Feature Films','MOSIAC.mp4') },
-          { title:'Music Video',                     type:'video', src: W+p('Feature Films','MUSIC VIDEO.mov') },
-          { title:'Sugar',                           type:'video', src: W+p('Feature Films','Sugar_2024.mov') },
-          { title:'Night of Melancholia',            type:'image', src: W+p('Feature Films','Night of Melacholia_poster.jpeg') },
-          { title:'REM',                             type:'image', src: W+p('Feature Films','REM_Poster.JPG') },
-          { title:'Somewhere Nowhere',               type:'image', src: W+p('Feature Films','Somewhere_Nowehre_Poster.PNG') },
-        ],
-      },
-    ];
+      projects.forEach(p => {
+        const clip = document.createElement('div');
+        clip.className = 'clip';
+        clip.dataset.cat   = cat;
+        clip.dataset.title = p.title;
+        clip.dataset.year  = p.year;
+        clip.dataset.fmt   = p.format;
+        clip.dataset.desc  = p.desc;
+        clip.dataset.link  = p.link || '';
+        clip.dataset.accent = ACCENTS[cat];
 
-    /* ────────────────────────────────────────────
-       BUILD SECTION CARDS
-    ──────────────────────────────────────────── */
-    const stageEl     = document.getElementById('stage');
-    const trackLeft   = document.getElementById('track-left');
-    const trackRight  = document.getElementById('track-right');
+        clip.innerHTML =
+          '<div class="clip-inner">' +
+          '<div class="clip-title">' + p.title.toUpperCase() + '</div>' +
+          '<div class="clip-format">' + p.year + ' · ' + p.format.split('·')[0].trim() + '</div>' +
+          '</div>';
 
-    /* Card height = 90% of stage height, calc after layout */
-    let CARD_H = 0, L_MAX = 0, R_MAX = 0;
+        if (p.link) {
+          clip.addEventListener('click', () => {
+            window.open(p.link, '_blank', 'noopener');
+          });
+        }
+        body.appendChild(clip);
+      });
+    });
 
-    function buildCard(sec) {
-      const card = document.createElement('div');
-      card.className = 'sec-card';
-      card.dataset.sec = sec.id;
+    document.getElementById('clip-count').textContent = totalClips + ' CLIPS';
 
-      /* Blurred background — same image scaled/blurred to fill the panel */
-      if (sec.coverType !== 'video') {
-        const bg = document.createElement('div');
-        bg.className = 'sec-bg';
-        bg.style.backgroundImage = `url('${sec.cover}')`;
-        card.appendChild(bg);
-      }
+    /* ── Preview card ─────────────────────────────────────────────────────── */
+    const card   = document.getElementById('preview-card');
+    const pvTitle = document.getElementById('pv-title');
+    const pvMeta  = document.getElementById('pv-meta');
+    const pvDesc  = document.getElementById('pv-desc');
+    let hideTimer = null;
 
-      /* Cover media */
-      if (sec.coverType === 'video') {
-        const vid = document.createElement('video');
-        vid.src = sec.cover;
-        vid.autoplay = true;
-        vid.muted = true;
-        vid.loop = true;
-        vid.playsInline = true;
-        vid.preload = 'auto';
-        /* Video is already 16:9 — cover fills panel nicely */
-        vid.style.objectFit = 'cover';
-        card.appendChild(vid);
-      } else {
-        const img = document.createElement('img');
-        img.src = sec.cover;
-        img.alt = sec.title;
-        img.loading = 'lazy';
-        card.appendChild(img);
-      }
+    document.querySelectorAll('.clip').forEach(clip => {
+      clip.addEventListener('mouseenter', function (e) {
+        clearTimeout(hideTimer);
+        pvTitle.textContent = clip.dataset.title;
+        pvMeta.textContent  = clip.dataset.year + ' · ' + clip.dataset.fmt;
+        pvDesc.textContent  = clip.dataset.desc;
+        card.style.setProperty('--preview-accent', clip.dataset.accent);
 
-      /* Gradient */
-      const grad = document.createElement('div');
-      grad.className = 'sec-card-grad';
-      card.appendChild(grad);
-
-      /* Arrow */
-      const arrow = document.createElement('div');
-      arrow.className = 'sec-card-arrow';
-      arrow.textContent = '↗ VIEW ALL';
-      card.appendChild(arrow);
-
-      /* Text block */
-      const txt = document.createElement('div');
-      txt.className = 'sec-card-text';
-      txt.innerHTML = `
-        <div class="sec-card-label">${sec.label.toUpperCase()}</div>
-        <div class="sec-card-title">${sec.title.toUpperCase()}</div>
-        <div class="sec-card-meta">${sec.count} WORKS &nbsp;·&nbsp; CLICK TO EXPLORE</div>
-      `;
-      card.appendChild(txt);
-
-      /* Click → open gallery */
-      card.addEventListener('click', () => openGallery(sec));
-
-      return card;
-    }
-
-    /* Left column: sections 0,1,2 in order */
-    [0,1,2].forEach(i => trackLeft.appendChild(buildCard(SECTIONS[i])));
-
-    /* Right column: sections 3,4,5 in order
-       At scroll=0 the right track is shifted up by maxTravel → bottom card (5=india) visible first */
-    [3,4,5].forEach(i => trackRight.appendChild(buildCard(SECTIONS[i])));
-
-    /* ────────────────────────────────────────────
-       SIZE CARDS + COMPUTE SCROLL LIMITS
-    ──────────────────────────────────────────── */
-    function sizeCards() {
-      const stageH = stageEl.offsetHeight;
-      CARD_H = Math.floor(stageH * 0.9);
-      const GAP = 14;
-
-      document.querySelectorAll('.sec-card').forEach(c => {
-        c.style.height = CARD_H + 'px';
+        positionCard(e);
+        card.classList.add('visible');
       });
 
-      /* Total track heights */
-      const leftTrackH  = CARD_H * 3 + GAP * 2;
-      const rightTrackH = CARD_H * 3 + GAP * 2;
+      clip.addEventListener('mousemove', positionCard);
 
-      L_MAX = Math.max(0, leftTrackH  - stageH);
-      R_MAX = Math.max(0, rightTrackH - stageH);
+      clip.addEventListener('mouseleave', () => {
+        hideTimer = setTimeout(() => card.classList.remove('visible'), 80);
+      });
+    });
 
-      /* Right column starts at -R_MAX (bottom card visible) */
-      applyTransforms();
+    function positionCard(e) {
+      const PAD = 14;
+      const CW = card.offsetWidth  || 240;
+      const CH = card.offsetHeight || 120;
+      let x = e.clientX + PAD;
+      let y = e.clientY - CH - PAD;
+      if (x + CW > window.innerWidth  - PAD) x = e.clientX - CW - PAD;
+      if (y < PAD) y = e.clientY + PAD;
+      card.style.left = x + 'px';
+      card.style.top  = y + 'px';
     }
 
-    /* ────────────────────────────────────────────
-       SMOOTH SCROLL SYSTEM
-    ──────────────────────────────────────────── */
-    let prog = 0;    /* current (eased), 0–1 */
-    let target = 0;  /* target, 0–1 */
-    let rafId;
-    let sprOffset = 0;  /* accumulated sprocket scroll in px */
-
-    const sprLeftEl  = document.getElementById('spr-left-holes');
-    const sprRightEl = document.getElementById('spr-right-holes');
-
-    /* Wheel / touch sensitivity */
-    const SPEED = 0.0008;
-
-    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-
-    window.addEventListener('wheel', e => {
-      e.preventDefault();
-      target = clamp(target + e.deltaY * SPEED, 0, 1);
-      document.getElementById('scroll-hint').classList.add('hidden');
-    }, { passive: false });
-
-    /* Touch support */
-    let touchY = 0;
-    window.addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, { passive: true });
-    window.addEventListener('touchmove', e => {
-      const dy = touchY - e.touches[0].clientY;
-      touchY = e.touches[0].clientY;
-      target = clamp(target + dy * SPEED * 1.8, 0, 1);
-    }, { passive: true });
-
-    function applyTransforms() {
-      /* Left scrolls UP */
-      trackLeft.style.transform  = `translateY(${-prog * L_MAX}px)`;
-      /* Right scrolls DOWN (starts at -R_MAX) */
-      trackRight.style.transform = `translateY(${-(1 - prog) * R_MAX}px)`;
-    }
-
-    function tick() {
-      const vel = (target - prog) * 0.055;
-      prog += vel;
-      applyTransforms();
-
-      /* Sprocket strips scroll in sync with columns */
-      sprOffset += vel * (L_MAX || 800);
-      sprLeftEl.style.backgroundPositionY  = (-sprOffset) + 'px';  /* left moves UP   */
-      sprRightEl.style.backgroundPositionY = ( sprOffset) + 'px';  /* right moves DOWN */
-
-      /* Progress bar */
-      document.getElementById('prog-bar').style.width = (prog * 100).toFixed(2) + '%';
-
-      /* Side nav dots */
-      updateDots();
-
-      rafId = requestAnimationFrame(tick);
-    }
-
-    /* ────────────────────────────────────────────
-       SIDE NAV DOTS
-    ──────────────────────────────────────────── */
-    const LEFT_NAMES  = ['Branding & Ads', 'Photography', 'Video Editing'];
-    const RIGHT_NAMES = ['Feature Films', 'Podcasts & Docs', 'Works from India'];
-
-    function buildDots(containerId, names, colKey) {
-      const el = document.getElementById(containerId);
-      names.forEach((name, i) => {
-        const wrap = document.createElement('div');
-        wrap.style.position = 'relative';
-        const dot = document.createElement('div');
-        dot.className = 'sd';
-        dot.dataset.idx = i;
-        // Click dot → jump scroll to that section
-        dot.addEventListener('click', () => {
-          target = i / (names.length - 1);
-          if (colKey === 'right') target = 1 - target;
+    /* ── Filter buttons ───────────────────────────────────────────────────── */
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const f = btn.dataset.filter;
+        document.querySelectorAll('.track').forEach(track => {
+          if (f === 'all' || track.dataset.cat === f) {
+            track.classList.remove('hidden');
+          } else {
+            track.classList.add('hidden');
+          }
         });
-        const lbl = document.createElement('span');
-        lbl.className = 'sd-label';
-        lbl.textContent = name.toUpperCase();
-        dot.appendChild(lbl);
-        wrap.appendChild(dot);
-        el.appendChild(wrap);
-      });
-    }
-    buildDots('sdl', LEFT_NAMES,  'left');
-    buildDots('sdr', RIGHT_NAMES, 'right');
-
-    function updateDots() {
-      const leftIdx  = Math.min(2, Math.round(prog * 2));
-      const rightIdx = Math.min(2, Math.round((1 - prog) * 2));
-      document.querySelectorAll('#sdl .sd').forEach((d, i) => d.classList.toggle('active', i === leftIdx));
-      document.querySelectorAll('#sdr .sd').forEach((d, i) => d.classList.toggle('active', i === rightIdx));
-    }
-
-    /* ────────────────────────────────────────────
-       INIT
-    ──────────────────────────────────────────── */
-    window.addEventListener('resize', sizeCards);
-    sizeCards();
-    requestAnimationFrame(tick);
-
-    /* ────────────────────────────────────────────
-       GALLERY MODAL
-    ──────────────────────────────────────────── */
-    const galModal = document.getElementById('gal-modal');
-    const galGrid  = document.getElementById('gal-grid');
-    const galTitle = document.getElementById('gal-title');
-
-    document.getElementById('gal-close').addEventListener('click', () => {
-      galModal.classList.remove('open');
-    });
-    galModal.addEventListener('click', e => {
-      if (e.target === galModal) galModal.classList.remove('open');
-    });
-
-    function openGallery(sec) {
-      galTitle.textContent = sec.title.toUpperCase();
-      galGrid.innerHTML = '';
-
-      sec.items.forEach(item => {
-        const cell = document.createElement('div');
-        cell.className = 'gal-item';
-
-        const img = document.createElement('img');
-        img.alt = item.title;
-        img.loading = 'lazy';
-
-        /* Thumbnail source */
-        if (item.link) {
-          /* Linked item — opens external URL in new tab */
-          img.src = item.src;
-          cell.addEventListener('click', () => window.open(item.link, '_blank', 'noopener,noreferrer'));
-          const ext = document.createElement('div');
-          ext.className = 'gal-item-ext';
-          ext.textContent = '↗';
-          cell.appendChild(ext);
-        } else if (item.type === 'video') {
-          extractFrame(item.src, img);
-          const play = document.createElement('div');
-          play.className = 'gal-item-play';
-          cell.appendChild(play);
-          cell.addEventListener('click', () => openVideo(item.src, item.title));
-        } else if (item.type === 'album') {
-          img.src = item.cover;
-          cell.addEventListener('click', () => openAlbum(item.album));
-        } else {
-          img.src = item.src;
-          cell.addEventListener('click', () => openLightbox([item.src], item.title, 0));
-        }
-
-        /* HubSpot badge */
-        if (item.badge) {
-          const badge = document.createElement('div');
-          badge.className = 'gal-hs-badge';
-          badge.textContent = item.badge;
-          cell.appendChild(badge);
-        }
-
-        /* Info overlay */
-        const info = document.createElement('div');
-        info.className = 'gal-item-info';
-        info.innerHTML = `<div class="gal-item-title">${item.title}</div>`;
-
-        cell.appendChild(img);
-        cell.appendChild(info);
-        galGrid.appendChild(cell);
-      });
-
-      galModal.classList.add('open');
-    }
-
-    /* ────────────────────────────────────────────
-       VIDEO MODAL
-    ──────────────────────────────────────────── */
-    const vidModal  = document.getElementById('vid-modal');
-    const vidPlayer = document.getElementById('vid-player');
-    const vidCap    = document.getElementById('vid-caption');
-
-    document.getElementById('vid-close').addEventListener('click', closeVideo);
-    vidModal.addEventListener('click', e => { if (e.target === vidModal) closeVideo(); });
-
-    function openVideo(src, title) {
-      vidPlayer.src = src;
-      vidCap.textContent = title.toUpperCase();
-      vidModal.classList.add('open');
-      vidPlayer.play().catch(() => {});
-    }
-    function closeVideo() {
-      vidPlayer.pause(); vidPlayer.src = '';
-      vidModal.classList.remove('open');
-    }
-
-    /* ────────────────────────────────────────────
-       LIGHTBOX
-    ──────────────────────────────────────────── */
-    const lbEl = document.getElementById('lightbox');
-    const lbImg = document.getElementById('lb-img');
-    const lbName = document.getElementById('lb-name');
-    const lbNum = document.getElementById('lb-num');
-    const lbThumbs = document.getElementById('lb-thumbs');
-    let lbSrcs = [], lbIdx = 0;
-
-    document.getElementById('lb-x').addEventListener('click', () => lbEl.classList.remove('open'));
-    document.getElementById('lb-prev').addEventListener('click', () => showLb(lbIdx - 1));
-    document.getElementById('lb-next').addEventListener('click', () => showLb(lbIdx + 1));
-    lbEl.addEventListener('click', e => { if (e.target === lbEl) lbEl.classList.remove('open'); });
-
-    function openAlbum(album) {
-      lbSrcs = album.photos.map(f => album.folder + '/' + f);
-      lbName.textContent = album.name.toUpperCase();
-      buildThumbs(); showLb(0); lbEl.classList.add('open');
-    }
-    function openLightbox(srcs, name, idx) {
-      lbSrcs = srcs;
-      lbName.textContent = name.toUpperCase();
-      buildThumbs(); showLb(idx); lbEl.classList.add('open');
-    }
-    function buildThumbs() {
-      lbThumbs.innerHTML = '';
-      lbSrcs.forEach((src, i) => {
-        const t = document.createElement('img');
-        t.className = 'lb-t' + (i === 0 ? ' on' : '');
-        t.src = src; t.loading = 'lazy';
-        t.addEventListener('click', () => showLb(i));
-        lbThumbs.appendChild(t);
-      });
-    }
-    function showLb(i) {
-      lbIdx = ((i % lbSrcs.length) + lbSrcs.length) % lbSrcs.length;
-      lbImg.src = lbSrcs[lbIdx];
-      lbNum.textContent = `${lbIdx + 1} / ${lbSrcs.length}`;
-      document.querySelectorAll('.lb-t').forEach((t, ti) => t.classList.toggle('on', ti === lbIdx));
-      const th = lbThumbs.querySelectorAll('.lb-t')[lbIdx];
-      if (th) th.scrollIntoView({ inline:'center', behavior:'smooth', block:'nearest' });
-    }
-
-    /* ────────────────────────────────────────────
-       KEYBOARD
-    ──────────────────────────────────────────── */
-    document.addEventListener('keydown', e => {
-      if (lbEl.classList.contains('open')) {
-        if (e.key === 'ArrowLeft')  showLb(lbIdx - 1);
-        if (e.key === 'ArrowRight') showLb(lbIdx + 1);
-        if (e.key === 'Escape') lbEl.classList.remove('open');
-      }
-      if (vidModal.classList.contains('open') && e.key === 'Escape') closeVideo();
-      if (galModal.classList.contains('open') && e.key === 'Escape') galModal.classList.remove('open');
-    });
-
-    /* ────────────────────────────────────────────
-       NAV TRANSITIONS
-    ──────────────────────────────────────────── */
-    document.querySelectorAll('a[href]').forEach(el => {
-      const href = el.getAttribute('href');
-      if (!href || href.startsWith('http') || href.startsWith('#')) return;
-      el.addEventListener('click', e => {
-        e.preventDefault();
-        document.getElementById('flash').classList.add('on');
-        setTimeout(() => { window.location.href = href; }, 280);
       });
     });
 
   })();
-
   </script>
-
-  <!-- FOOTER NAV -->
-  <footer id="works-footer">
-    <a href="index.html">○ HOME</a>
-    <a href="about.html">◄◄ ABOUT</a>
-    <a href="contact.html">CONTACT □</a>
-  </footer>
 
   <script src="film-transition.js"></script>
 </body>
