@@ -278,19 +278,31 @@
       border: 1px solid rgba(255,255,255,0.1);
       border-top: 2px solid var(--preview-accent, var(--amber));
       border-radius: 4px;
-      padding: 16px 18px;
+      overflow: hidden;
+      padding: 0;
       pointer-events: none;
       opacity: 0;
       transition: opacity .12s;
       backdrop-filter: blur(12px);
     }
     #preview-card.visible { opacity: 1; }
+    /* Poster thumbnail */
+    #pv-poster {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      display: block;
+      background: rgba(255,255,255,0.04);
+    }
+    #pv-poster.hidden { display: none; }
+    /* Text area */
+    #pv-body { padding: 14px 16px; }
     .pv-title {
       font-family: 'VT323', monospace;
       font-size: 1.5rem;
       letter-spacing: .1em;
       color: var(--text);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       line-height: 1.1;
     }
     .pv-meta {
