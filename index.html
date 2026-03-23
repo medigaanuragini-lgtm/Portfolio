@@ -1085,7 +1085,29 @@
     window.addEventListener('resize', () => { noiseEl.width = 320; noiseEl.height = 180; });
 
     /* ── GO ── */
-    setTimeout(stage1, 250);
+    if (localStorage.getItem('anu_intro_seen')) {
+      // Returning visitor — skip straight to VHS label, no intro
+      introComplete = true;
+      labelRevealed = false;
+      scanlinesEl.style.opacity = '1';
+      setNoise(0.04);
+      hudBR.style.opacity = '1';
+      hudTL.style.opacity = '1';
+      trackingBtn.style.opacity = '1';
+      sndBtn.style.opacity = '1';
+      startMs = Date.now();
+      promptEl.style.opacity = '0';
+      promptEl.style.pointerEvents = 'none';
+      labelWrap.classList.add('show');
+      vcrNav.classList.add('show');
+      labelRevealed = true;
+      startMouseTracking();
+      startAmbient();
+      if (!audioOn) enableAudio();
+      setTimeout(() => { playWelcomeChord(); }, 80);
+    } else {
+      setTimeout(stage1, 250);
+    }
 
   })();
   </script>
