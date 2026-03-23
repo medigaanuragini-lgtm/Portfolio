@@ -361,6 +361,156 @@
     }
     .sb-nav a:hover { color: var(--text); }
 
+    /* ══════════════════════════════════
+       MONITOR MODAL
+    ══════════════════════════════════ */
+    #monitor-modal {
+      display: none;
+      position: fixed; inset: 0;
+      z-index: 9900;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(6px);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #monitor-modal.open { display: flex; }
+
+    /* Bezel */
+    #monitor-bezel {
+      position: relative;
+      background: #0d0d0d;
+      border: 2px solid rgba(201,168,76,0.25);
+      border-radius: 6px;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.8), 0 32px 80px rgba(0,0,0,.8);
+      display: flex; flex-direction: column;
+      width: min(92vw, 1100px);
+      max-height: 88vh;
+      overflow: hidden;
+    }
+
+    /* Corner markers */
+    #monitor-bezel::before, #monitor-bezel::after,
+    #monitor-inner::before, #monitor-inner::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      border-color: var(--amber);
+      border-style: solid;
+      z-index: 2;
+    }
+    #monitor-bezel::before  { top: 6px; left: 6px;  border-width: 2px 0 0 2px; }
+    #monitor-bezel::after   { top: 6px; right: 6px; border-width: 2px 2px 0 0; }
+    #monitor-inner::before  { bottom: 6px; left: 6px;  border-width: 0 0 2px 2px; }
+    #monitor-inner::after   { bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
+
+    /* Top bar */
+    #monitor-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03);
+      flex-shrink: 0;
+    }
+    #monitor-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .72rem;
+      font-weight: bold;
+      letter-spacing: .2em;
+      color: var(--amber);
+    }
+    #monitor-close {
+      background: none; border: none;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .72rem;
+      font-weight: bold;
+      letter-spacing: .12em;
+      color: var(--dim);
+      cursor: pointer;
+      padding: 4px 10px;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 3px;
+      transition: color .12s, border-color .12s;
+    }
+    #monitor-close:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+    /* Screen area */
+    #monitor-inner {
+      position: relative;
+      flex: 1;
+      background: #000;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 300px;
+      overflow: hidden;
+    }
+    #monitor-inner img {
+      max-width: 100%; max-height: 70vh;
+      object-fit: contain;
+      display: block;
+    }
+    #monitor-inner iframe {
+      width: 100%; height: 100%;
+      min-height: 480px;
+      border: none;
+      display: block;
+    }
+    #monitor-placeholder {
+      font-family: 'VT323', monospace;
+      font-size: 2rem;
+      letter-spacing: .2em;
+      color: rgba(201,168,76,0.3);
+      text-align: center;
+      padding: 60px;
+    }
+
+    /* Bottom info bar */
+    #monitor-infobar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 20px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      background: rgba(0,0,0,.6);
+      flex-shrink: 0;
+    }
+    #monitor-title {
+      font-family: 'VT323', monospace;
+      font-size: 1.6rem;
+      letter-spacing: .14em;
+      color: var(--text);
+      line-height: 1;
+    }
+    #monitor-meta {
+      font-size: .7rem;
+      font-weight: bold;
+      letter-spacing: .12em;
+      color: var(--dim);
+    }
+    #monitor-link {
+      font-size: .7rem;
+      font-weight: bold;
+      letter-spacing: .12em;
+      color: var(--amber);
+      text-decoration: none;
+      border: 1px solid rgba(201,168,76,0.3);
+      padding: 5px 12px;
+      border-radius: 3px;
+      transition: background .14s;
+    }
+    #monitor-link:hover { background: rgba(201,168,76,0.1); }
+    #monitor-link.hidden { display: none; }
+
+    /* Scanline overlay inside monitor */
+    #monitor-inner::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0, transparent 3px,
+        rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 3;
+    }
+
   </style>
 </head>
 <body>
