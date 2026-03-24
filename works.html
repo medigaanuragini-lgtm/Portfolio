@@ -928,7 +928,20 @@
         monLink.classList.add('hidden');
       }
 
-      // Gallery takes priority, then single img, then YouTube, then Vimeo
+      // Priority: gallery → single img → YouTube → Vimeo → Instagram → generic iframe → X fallback
+      const makeIframe = (src, extraAllow) => {
+        monPlaceholder.style.display = 'none';
+        const el = document.createElement('iframe');
+        el.src = src;
+        el.allow = 'autoplay; fullscreen' + (extraAllow ? '; ' + extraAllow : '');
+        el.allowFullscreen = true;
+        el.style.width = '100%';
+        el.style.height = '100%';
+        el.style.minHeight = '480px';
+        el.style.border = 'none';
+        monInner.insertBefore(el, galleryPrev);
+      };
+
       if (p.gallery && p.gallery.length > 0) {
         galleryImages = p.gallery;
         galleryCounter.classList.remove('hidden');
@@ -941,28 +954,19 @@
         el.style.maxHeight = '72vh';
         el.style.objectFit = 'contain';
         monInner.insertBefore(el, galleryPrev);
+      } else if (getYTId(p.link)) {
+        makeIframe('https://www.youtube.com/embed/' + getYTId(p.link) + '?autoplay=1&rel=0');
+      } else if (getVimeoId(p.link)) {
+        makeIframe('https://player.vimeo.com/video/' + getVimeoId(p.link) + '?autoplay=1');
+      } else if (getInstaEmbed(p.link)) {
+        makeIframe(getInstaEmbed(p.link));
+      } else if (p.link && !isXLink(p.link)) {
+        // Generic external link — try iframe embed (Brand Innovators, etc.)
+        makeIframe(p.link);
       } else {
-        const ytId    = getYTId(p.link);
-        const vimeoId = getVimeoId(p.link);
-        if (ytId) {
-          monPlaceholder.style.display = 'none';
-          const el = document.createElement('iframe');
-          el.src = 'https://www.youtube.com/embed/' + ytId + '?autoplay=1&rel=0';
-          el.allow = 'autoplay; fullscreen';
-          el.allowFullscreen = true;
-          monInner.insertBefore(el, galleryPrev);
-        } else if (vimeoId) {
-          monPlaceholder.style.display = 'none';
-          const el = document.createElement('iframe');
-          el.src = 'https://player.vimeo.com/video/' + vimeoId + '?autoplay=1';
-          el.allow = 'autoplay; fullscreen';
-          el.allowFullscreen = true;
-          monInner.insertBefore(el, galleryPrev);
-        } else if (p.link) {
-          // Instagram / X / external — can't embed, show prompt
-          monPlaceholder.textContent = '▶  CLICK OPEN LINK TO VIEW';
-          monPlaceholder.style.display = '';
-        }
+        // X/Twitter and no-link items — can't embed, prompt user
+        monPlaceholder.textContent = '▶  CLICK "OPEN LINK" TO VIEW';
+        monPlaceholder.style.display = '';
       }
 
       modal.classList.add('open');
