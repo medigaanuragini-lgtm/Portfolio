@@ -883,6 +883,14 @@
       const m = url && url.match(/vimeo\.com\/(\d+)/);
       return m ? m[1] : null;
     }
+    function getInstaEmbed(url) {
+      // Converts instagram.com/p/CODE/ or /reel/CODE/ → embed URL
+      const m = url && url.match(/instagram\.com\/(p|reel|tv)\/([\w-]+)/);
+      return m ? 'https://www.instagram.com/' + m[1] + '/' + m[2] + '/embed/' : null;
+    }
+    function isXLink(url) {
+      return url && (url.includes('x.com') || url.includes('twitter.com'));
+    }
 
     function showGalleryImage(idx) {
       monInner.querySelectorAll('img').forEach(el => el.remove());
