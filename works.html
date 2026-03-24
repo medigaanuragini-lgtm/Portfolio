@@ -999,6 +999,7 @@
 
     function closeMonitor() {
       modal.classList.remove('open');
+      modal.classList.remove('portrait');
       monInner.querySelectorAll('iframe').forEach(el => el.remove());
     }
 
