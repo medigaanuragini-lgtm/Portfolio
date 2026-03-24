@@ -627,6 +627,55 @@
       #gallery-counter { font-size: 0.65rem; padding: 3px 8px; }
     }
 
+    /* ══════════════════════════════════
+       VIDEO TILE GRID (HubSpot etc.)
+    ══════════════════════════════════ */
+    #video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 8px;
+      padding: 16px;
+      width: 100%;
+      overflow-y: auto;
+    }
+    #video-grid.hidden { display: none; }
+    .video-tile {
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 3px;
+      overflow: hidden;
+      background: rgba(0,0,0,0.5);
+      transition: border-color 0.14s, transform 0.12s;
+    }
+    .video-tile:hover {
+      border-color: rgba(201,168,76,0.5);
+      transform: translateY(-2px);
+    }
+    .video-tile img {
+      width: 100%; display: block;
+      aspect-ratio: 16/9; object-fit: cover;
+    }
+    .video-tile-label {
+      font-size: 0.6rem; font-weight: bold;
+      padding: 5px 8px; letter-spacing: 0.07em;
+      color: rgba(216,212,188,0.7);
+    }
+    #video-grid-back {
+      position: absolute; top: 10px; left: 10px;
+      z-index: 5;
+      background: rgba(0,0,0,0.75);
+      border: 1px solid rgba(201,168,76,0.35);
+      color: #c9a84c;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; font-weight: bold;
+      letter-spacing: 0.12em;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 3px;
+      display: none;
+    }
+    #video-grid-back.visible { display: block; }
+
   </style>
 </head>
 <body>
