@@ -927,6 +927,13 @@
       galleryPrev.classList.add('hidden');
       galleryNext.classList.add('hidden');
 
+      // Set aspect ratio: 9:16 for Instagram, 16:9 for everything else
+      if (getInstaEmbed(p.link)) {
+        modal.classList.add('portrait');
+      } else {
+        modal.classList.remove('portrait');
+      }
+
       monTitle.textContent = p.title.toUpperCase();
       monMeta.textContent  = p.year + '  ·  ' + p.format;
 
