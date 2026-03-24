@@ -902,6 +902,7 @@
     function openMonitor(p) {
       // Clear previous
       monInner.querySelectorAll('img, iframe').forEach(el => el.remove());
+      monPlaceholder.textContent = 'NO SIGNAL';
       monPlaceholder.style.display = '';
       galleryImages = [];
       galleryIdx = 0;
