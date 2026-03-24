@@ -1041,6 +1041,9 @@
       galleryNext.classList.toggle('hidden', idx === galleryImages.length - 1);
     }
 
+    const videoGrid     = document.getElementById('video-grid');
+    const videoGridBack = document.getElementById('video-grid-back');
+
     function openMonitor(p) {
       // Clear previous
       monInner.querySelectorAll('img, iframe').forEach(el => el.remove());
@@ -1051,6 +1054,9 @@
       galleryCounter.classList.add('hidden');
       galleryPrev.classList.add('hidden');
       galleryNext.classList.add('hidden');
+      videoGrid.classList.add('hidden');
+      videoGrid.innerHTML = '';
+      videoGridBack.classList.remove('visible');
 
       // Set aspect ratio: 9:16 for Instagram, 16:9 for everything else
       if (getInstaEmbed(p.link)) {
@@ -1069,9 +1075,11 @@
         monLink.classList.add('hidden');
       }
 
-      // Priority: gallery → single img → YouTube → Vimeo → Instagram → generic iframe → X fallback
+      // Priority: videos array → gallery → single img → YouTube → Vimeo → Instagram → generic iframe → X fallback
       const makeIframe = (src, extraAllow) => {
         monPlaceholder.style.display = 'none';
+        videoGrid.classList.add('hidden');
+        videoGridBack.classList.remove('visible');
         const el = document.createElement('iframe');
         el.src = src;
         el.allow = 'autoplay; fullscreen' + (extraAllow ? '; ' + extraAllow : '');
@@ -1079,7 +1087,25 @@
         monInner.insertBefore(el, galleryPrev);
       };
 
-      if (p.gallery && p.gallery.length > 0) {
+      if (p.videos && p.videos.length > 0) {
+        // Show video tile grid
+        monPlaceholder.style.display = 'none';
+        videoGrid.classList.remove('hidden');
+        p.videos.forEach(v => {
+          const tile = document.createElement('div');
+          tile.className = 'video-tile';
+          tile.innerHTML =
+            '<img src="https://img.youtube.com/vi/' + v.ytId + '/mqdefault.jpg" alt="' + v.title + '" loading="lazy">' +
+            '<div class="video-tile-label">' + v.title.toUpperCase() + '</div>';
+          tile.addEventListener('click', function(e) {
+            e.stopPropagation();
+            videoGrid.classList.add('hidden');
+            makeIframe('https://www.youtube.com/embed/' + v.ytId + '?autoplay=1&rel=0');
+            videoGridBack.classList.add('visible');
+          });
+          videoGrid.appendChild(tile);
+        });
+      } else if (p.gallery && p.gallery.length > 0) {
         galleryImages = p.gallery;
         galleryCounter.classList.remove('hidden');
         showGalleryImage(0);
@@ -1108,6 +1134,14 @@
 
       modal.classList.add('open');
     }
+
+    // Back button: hide iframe, show video grid again
+    videoGridBack.addEventListener('click', function(e) {
+      e.stopPropagation();
+      monInner.querySelectorAll('iframe').forEach(el => el.remove());
+      videoGrid.classList.remove('hidden');
+      videoGridBack.classList.remove('visible');
+    });
 
     galleryPrev.addEventListener('click', function(e) {
       e.stopPropagation();
