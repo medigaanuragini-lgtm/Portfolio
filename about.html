@@ -740,5 +740,43 @@
 </script>
 
 <script src="film-transition.js"></script>
+<script>
+/* ── VCR click sound on every click ── */
+(function() {
+  var audioCtx = null, masterGain = null, audioOn = false;
+  function initAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 1;
+    masterGain.connect(audioCtx.destination);
+  }
+  function playVcrClick() {
+    if (!audioCtx) return;
+    var len = Math.floor(audioCtx.sampleRate * 0.06);
+    var buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+    var data = buf.getChannelData(0);
+    for (var i = 0; i < len; i++) {
+      var env = Math.exp(-i / (len * 0.18));
+      data[i] = (Math.random() * 2 - 1) * env;
+    }
+    var src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    var lp = audioCtx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 800;
+    var gain = audioCtx.createGain(); gain.gain.value = 0.22;
+    src.connect(lp); lp.connect(gain); gain.connect(masterGain);
+    src.start();
+  }
+  document.addEventListener('click', function() {
+    if (!audioOn) {
+      initAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      audioOn = true;
+    }
+    playVcrClick();
+  }, true);
+})();
+</script>
 </body>
 </html>
