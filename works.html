@@ -930,7 +930,8 @@
         clip.dataset.desc  = p.desc;
         clip.dataset.link    = p.link || '';
         clip.dataset.img     = p.img  || '';
-        clip.dataset.gallery0 = (p.gallery && p.gallery[0]) || '';
+        clip.dataset.gallery0 = (p.gallery && p.gallery[0]) ||
+          (p.videos && p.videos[0] ? 'https://img.youtube.com/vi/' + p.videos[0].ytId + '/mqdefault.jpg' : '');
         clip.dataset.accent  = ACCENTS[cat];
 
         clip.innerHTML =
