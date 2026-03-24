@@ -1224,10 +1224,13 @@
     document.addEventListener('click', function() {
       if (!audioOn) {
         initAudio();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
         audioOn = true;
+        audioCtx.resume().then(playVcrClick);
+      } else if (audioCtx.state === 'suspended') {
+        audioCtx.resume().then(playVcrClick);
+      } else {
+        playVcrClick();
       }
-      playVcrClick();
     }, true);
   })();
   </script>
