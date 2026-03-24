@@ -454,41 +454,66 @@
     /* ══════════════════════════════════
        MOBILE
     ══════════════════════════════════ */
-    @media (max-width: 768px) {
+    @media (max-width: 600px) {
+      /* Allow page to scroll */
       html, body { height: auto; overflow-y: auto; min-height: 100vh; }
-      .page { height: auto; min-height: 100vh; }
+      .page { height: auto; padding: 10px 10px 10px; gap: 8px; }
+
+      /* Header: stacked, compact */
+      .sb-header {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 10px 14px 12px;
+      }
+      .sb-center { order: -1; }
+      .sb-center-title { font-size: clamp(1.8rem, 8vw, 3rem); }
+      .sb-center-nav { gap: 6px; flex-wrap: wrap; justify-content: center; }
+      .sb-fields { flex-direction: row; flex-wrap: wrap; gap: 3px 14px; }
+      .sb-fields-right {
+        flex-direction: row; flex-wrap: wrap; gap: 3px 14px;
+        align-items: flex-start; text-align: left;
+      }
+      .sb-field-val { font-size: 0.75rem; min-width: auto; }
+
+      /* Panels: single column, each panel is a substantial card */
       .panels {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: unset;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
         flex: none;
         height: auto;
       }
-      .panel { aspect-ratio: 3 / 4; position: relative; min-height: unset; }
-      .panel-inner { position: absolute; inset: 0; }
-      .sb-header { grid-template-columns: 1fr 1fr; }
-      .sb-center { grid-column: 1 / -1; order: -1; }
-      .sb-center-title { font-size: clamp(1.5rem, 4.5vw, 2.2rem); }
-      .sb-field-val { font-size: 0.78rem; }
-      .page-footer { padding: 8px 0 10px; }
-    }
-
-    @media (max-width: 480px) {
-      .panels { grid-template-columns: 1fr; }
-      .panel { aspect-ratio: 16 / 10; }
-      .sb-header {
-        display: flex; flex-direction: column; gap: 6px;
-        align-items: flex-start;
+      .panel {
+        height: 68vw;        /* big enough to show the image + read content */
+        min-height: 220px;
+        max-height: 320px;
+        position: relative;
+        aspect-ratio: unset;
+        cursor: pointer;
       }
-      .sb-center { order: -1; width: 100%; }
-      .sb-fields-right { align-items: flex-start; text-align: left; }
+      .panel-inner { position: absolute; inset: 0; }
+
+      /* Tap to flip instead of hover */
+      .flip-hint { opacity: 0.45 !important; font-size: 0.45rem; }
+
+      /* Notes: slightly tighter on mobile */
       .notes-para,
       .notes-quote,
       .notes-list li,
-      .notes-footnote { font-size: 12px; line-height: 28px; }
-      .notes-inner { background-size: 100% 28px; background-position: 0 11px; }
-      .skill-item { font-size: 11px; line-height: 24px; }
-      .skills-grid { gap: 0; }
-      .page-vcr-btn { font-size: clamp(1.3rem, 6vw, 2rem); }
+      .notes-footnote { font-size: 13px; line-height: 30px; }
+      .notes-inner {
+        background-size: 100% 30px;
+        background-position: 0 11px;
+        padding: 11px 14px 8px;
+      }
+      .notes-title { line-height: 30px; height: 30px; font-size: 0.95rem; }
+      .skill-item { font-size: 12px; line-height: 26px; }
+      .skills-grid { gap: 0 4px; }
+
+      /* Footer */
+      .page-footer { padding: 10px 0 14px; }
+      .page-vcr-btn { font-size: clamp(1.5rem, 7vw, 2.4rem); }
     }
 
   </style>
