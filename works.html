@@ -949,6 +949,10 @@
           el.allow = 'autoplay; fullscreen';
           el.allowFullscreen = true;
           monInner.insertBefore(el, galleryPrev);
+        } else if (p.link) {
+          // Instagram / X / external — can't embed, show prompt
+          monPlaceholder.textContent = '▶  CLICK OPEN LINK TO VIEW';
+          monPlaceholder.style.display = '';
         }
       }
 
