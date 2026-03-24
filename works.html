@@ -554,54 +554,77 @@
     /* ══════════════════════════════════
        MOBILE
     ══════════════════════════════════ */
-    @media (max-width: 768px) {
+    @media (max-width: 600px) {
       :root {
-        --topH:   56px;
-        --botH:   52px;
-        --labelW: 110px;
-        --clipH:  64px;
-        --clipW:  160px;
+        --topH: 52px;
+        --botH: 54px;
+        --clipH: 60px;
       }
-      #page-title { font-size: 1.8rem; }
-      .filter-btn { padding: 5px 10px; font-size: 0.7rem; letter-spacing: 0.06em; gap: 6px; }
-      .cat-dot { width: 7px; height: 7px; }
-      .track-head { padding: 10px 10px; }
-      .track-name { font-size: 1.2rem; letter-spacing: 0.08em; }
-      .track-cat  { font-size: 0.56rem; }
-      .clip-title  { font-size: 0.76rem; }
-      .clip-format { font-size: 0.58rem; }
-      #preview-card { display: none; } /* hover preview hides on touch */
-      .sb-vcr-btn { font-size: clamp(1.2rem, 5.5vw, 1.8rem); }
-    }
 
-    @media (max-width: 480px) {
-      :root {
-        --labelW: 72px;
-        --clipW:  calc(50vw - 50px);
-        --clipH:  58px;
-      }
-      .track-name { font-size: 0.95rem; }
-      .track-cat  { display: none; }
-      .track-dot  { width: 8px; height: 8px; }
-      .filter-btn { padding: 4px 8px; font-size: 0.65rem; }
+      /* Toolbar: compact */
       #toolbar-left { padding: 0 12px; }
+      #page-title { font-size: 1.6rem; letter-spacing: 0.18em; }
+      #filters { padding: 0 10px; gap: 5px; }
+      .filter-btn { padding: 5px 11px; font-size: 0.68rem; letter-spacing: 0.06em; gap: 5px; }
+      .cat-dot { width: 7px; height: 7px; }
 
-      /* Monitor: full width, keep aspect ratio */
+      /* Preview card: disable on touch */
+      #preview-card { display: none; }
+
+      /* Track: stack header ABOVE clips (not side-by-side) */
+      .track { flex-direction: column; }
+      .track-head {
+        width: 100% !important;          /* override the hardcoded 220px */
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        min-height: unset;
+      }
+      .track-indicator { margin-bottom: 0; }
+      .track-name { font-size: 1.1rem; letter-spacing: 0.1em; }
+      .track-cat  { font-size: 0.6rem; }
+      .track-count { margin-top: 0; margin-left: auto; font-size: 0.6rem; }
+
+      /* Clips: 2 per row, full width available */
+      .track-body {
+        padding: 10px 12px;
+        gap: 7px;
+      }
+      .clip {
+        width: calc(50% - 4px);
+        height: var(--clipH);
+        padding: 0 10px;
+      }
+      .clip-title  { font-size: 0.7rem; letter-spacing: 0.04em; }
+      .clip-format { font-size: 0.55rem; }
+
+      /* Footer VCR */
+      .sb-vcr-btn { font-size: clamp(1.2rem, 6vw, 1.9rem); }
+
+      /* Monitor modal: full-screen on mobile */
       #monitor-bezel {
         width: 100vw !important;
+        max-width: 100vw !important;
         border-radius: 0;
         border-left: none;
         border-right: none;
-        max-height: 96vh;
+        max-height: 100svh;
       }
       #monitor-modal.portrait #monitor-bezel {
-        width: 85vw !important;
+        width: 100vw !important;
       }
-      #monitor-title { font-size: 1.2rem; }
-      #monitor-meta  { font-size: 0.6rem; }
-      #monitor-close { font-size: 0.6rem; padding: 3px 8px; }
+      #monitor-topbar { padding: 6px 12px; }
+      #monitor-label  { font-size: 0.62rem; }
+      #monitor-close  { font-size: 0.62rem; padding: 3px 8px; }
       #monitor-infobar { padding: 8px 12px; }
-      #monitor-link { font-size: 0.6rem; padding: 4px 8px; }
+      #monitor-title  { font-size: 1.2rem; }
+      #monitor-meta   { font-size: 0.6rem; }
+      #monitor-link   { font-size: 0.6rem; padding: 4px 9px; }
+      .gallery-arrow  { width: 36px; height: 36px; font-size: 1rem; }
+      #gallery-counter { font-size: 0.65rem; padding: 3px 8px; }
     }
 
   </style>
