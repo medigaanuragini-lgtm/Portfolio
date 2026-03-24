@@ -351,23 +351,53 @@
     /* ══════════════════════════════════
        MOBILE
     ══════════════════════════════════ */
-    @media (max-width: 640px) {
-      .lbl-stripe { height: 48px; padding: 0 16px; }
+    @media (max-width: 600px) {
+      /* Label fills screen, scrolls if needed */
+      #label-wrap {
+        position: absolute;
+        justify-content: flex-start;
+        align-items: stretch;
+        padding: 56px 14px 88px;
+        overflow-y: auto;
+        gap: 18px;
+      }
+      #vhs-label { width: 100%; }
+
+      /* Stripe: compact */
+      .lbl-stripe { height: 46px; padding: 0 16px; }
       .lbl-stripe-r { display: none; }
-      .lbl-body { padding: 14px 16px 16px; font-size: 0.95rem; }
-      .lbl-title { font-size: clamp(1.8rem, 8vw, 3rem); }
-      .lbl-role  { font-size: 0.85em; }
-      .lbl-line  { font-size: 0.85em; }
-      .lbl-stat-grid { grid-template-columns: 1fr; gap: 0; }
-      .lbl-hint { display: none; }
-      .lbl-resume-btn { font-size: 0.65rem; padding: 2px 8px; }
-      .lbl-ig-link { font-size: 0.88rem; letter-spacing: 0.22em; }
-      #vcr-nav { gap: clamp(14px, 5vw, 32px); }
-      .vcr-btn { font-size: clamp(1.4rem, 6.5vw, 2.2rem); }
+      .lbl-ig-link { font-size: 0.85rem; letter-spacing: 0.18em; }
+      .lbl-resume-btn { font-size: 0.62rem; padding: 2px 8px; }
+
+      /* Body: remove non-essential rows */
+      .lbl-body { padding: 14px 16px 18px; font-size: 0.9rem; }
+      .lbl-title { font-size: clamp(2rem, 9.5vw, 3.5rem); margin-bottom: 4px; }
+      .lbl-role  { margin-bottom: 2px; }
+      .lbl-line  { display: none; }
+      .lbl-quirk { display: none; }
+      .lbl-stat-grid { grid-template-columns: 1fr 1fr; gap: 0; }
+      .lbl-hint  { display: none; }
+
+      /* VCR nav: always visible, fixed to bottom */
+      #vcr-nav {
+        position: fixed !important;
+        bottom: 0; left: 0; right: 0;
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: all !important;
+        background: rgba(0,0,0,0.94);
+        border-top: 1px solid rgba(201,168,76,0.12);
+        padding: 10px 0 16px;
+        justify-content: center;
+        gap: clamp(20px, 7vw, 48px);
+        z-index: 200;
+      }
+      .vcr-btn { font-size: clamp(1.5rem, 7.5vw, 2.4rem); }
+
+      /* HUD: minimal */
       #hud-tl { top: 12px; left: 12px; }
-      #hud-br { bottom: 72px; right: 12px; }
-      #hud-bl { bottom: 72px; left: 12px; }
-      #label-wrap { gap: 22px; }
+      #hud-br { display: none; }
+      #hud-bl { display: none; }
     }
 
   </style>
