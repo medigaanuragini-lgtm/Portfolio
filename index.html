@@ -1082,6 +1082,11 @@
     document.addEventListener('mousemove', () => { if (labelRevealed) resetIdleTimer(); });
     document.addEventListener('keydown',   () => { if (labelRevealed) resetIdleTimer(); });
 
+    /* ── Global click sound ── */
+    document.addEventListener('click', function() {
+      if (audioOn) playVcrClick();
+    }, true);
+
     /* ══════════════
        VCR NAV HOVER + CLICK
     ══════════════ */
