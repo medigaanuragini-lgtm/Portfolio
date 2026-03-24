@@ -378,9 +378,14 @@
       border-radius: 6px;
       box-shadow: 0 0 0 1px rgba(0,0,0,.8), 0 32px 80px rgba(0,0,0,.8);
       display: flex; flex-direction: column;
-      width: min(92vw, 1100px);
-      max-height: 88vh;
+      width: min(92vw, 1100px);       /* 16:9 default */
+      max-height: 94vh;
       overflow: hidden;
+      transition: width .25s ease;
+    }
+    /* 9:16 portrait mode (Instagram) */
+    #monitor-modal.portrait #monitor-bezel {
+      width: min(46vh, 420px);
     }
 
     /* Corner markers */
