@@ -348,6 +348,28 @@
       animation: blink 1.6s step-start infinite;
     }
 
+    /* ══════════════════════════════════
+       MOBILE
+    ══════════════════════════════════ */
+    @media (max-width: 640px) {
+      .lbl-stripe { height: 48px; padding: 0 16px; }
+      .lbl-stripe-r { display: none; }
+      .lbl-body { padding: 14px 16px 16px; font-size: 0.95rem; }
+      .lbl-title { font-size: clamp(1.8rem, 8vw, 3rem); }
+      .lbl-role  { font-size: 0.85em; }
+      .lbl-line  { font-size: 0.85em; }
+      .lbl-stat-grid { grid-template-columns: 1fr; gap: 0; }
+      .lbl-hint { display: none; }
+      .lbl-resume-btn { font-size: 0.65rem; padding: 2px 8px; }
+      .lbl-ig-link { font-size: 0.88rem; letter-spacing: 0.22em; }
+      #vcr-nav { gap: clamp(14px, 5vw, 32px); }
+      .vcr-btn { font-size: clamp(1.4rem, 6.5vw, 2.2rem); }
+      #hud-tl { top: 12px; left: 12px; }
+      #hud-br { bottom: 72px; right: 12px; }
+      #hud-bl { bottom: 72px; left: 12px; }
+      #label-wrap { gap: 22px; }
+    }
+
   </style>
 </head>
 <body>
