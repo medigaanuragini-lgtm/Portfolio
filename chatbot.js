@@ -225,15 +225,18 @@
   panel.id = 'chat-panel';
   panel.innerHTML = `
     <div id="chat-head">
-      <span id="chat-head-label">// ASK ANU</span>
+      <div id="chat-head-left">
+        <span id="chat-head-name">ANU</span>
+        <span id="chat-head-sub">CREATIVE PRODUCER · NYC</span>
+      </div>
       <button id="chat-x">✕</button>
     </div>
     <div id="chat-log">
-      <div class="cm bot">Hey! Ask me about Anu's work, creative process, or how to get in touch.</div>
+      <div class="cm bot">Hey! Ask me about Anu's work, process, or how to get in touch.</div>
     </div>
     <div id="chat-bar">
-      <input id="chat-in" type="text" placeholder="type your question…" autocomplete="off">
-      <button id="chat-go">→</button>
+      <input id="chat-in" type="text" placeholder="ask anything…" autocomplete="off">
+      <button id="chat-go">↑</button>
     </div>
   `;
 
