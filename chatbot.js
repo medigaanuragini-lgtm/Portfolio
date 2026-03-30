@@ -316,115 +316,139 @@
   /* ── Knowledge base ── */
   const KB = [
     { k: ['hello','hi','hey','sup','yo','hiya','howdy','start'],
-      r: 'Hey! Ask me anything about Anu\'s work, process, tools, or how to hire her.' },
+      r: 'Hey! I\'m Anu — ask me anything about my work, process, tools, or how to work together.' },
 
-    { k: ['who is','who are','about anu','anuragini','bio','background'],
-      r: 'Anu (Anuragini Mediga) is a Creative Producer, Video Artist, and Director based in NYC. She works across the full production pipeline — from concept to camera to post — for brands, films, events, and documentaries.' },
+    { k: ['who is','who are','about anu','anuragini','bio','background','yourself','who you'],
+      r: 'I\'m Anuragini Mediga — a Creative Producer, Video Artist, and Director based in NYC, originally from Hyderabad. I work across the full production pipeline, from concept to camera to post, for brands, films, events, and documentaries.' },
 
-    { k: ['what do you do','role','title','job','position','what does anu do'],
-      r: 'Anu works as a Creative Producer, Director, Cinematographer, Editor, and Colorist — often all at once. She\'s led full productions from concept through final delivery across brand content, short films, live events, and documentary.' },
+    { k: ['what do you do','role','title','job','position'],
+      r: 'I work as a Creative Producer, Director, Cinematographer, Editor, and Colorist — often all at once. I\'ve led full productions from concept through final delivery across brand content, short films, live events, and documentary.' },
 
-    { k: ['services','offer','specialize','capabilities'],
-      r: 'Anu offers:\n→ Creative Production & Direction\n→ Cinematography (Sony, Canon, RED, Arri)\n→ Editing & Color Grading (Premiere, Resolve)\n→ Live & Broadcast Production (ATEM Mini Pro)\n→ Event & Product Photography\n→ Podcast & Documentary Production\n→ Brand Campaign Strategy' },
+    { k: ['services','offer','specialize','capabilities','what kind of work','take on','projects'],
+      r: 'I take on:\n→ Films & narrative projects\n→ Brand ads & brand films\n→ Scripting all the way through production\n→ Social media content — end to end\n→ Event videography & photography\n→ Live streaming & broadcast\n→ Podcast & documentary production' },
 
-    { k: ['tool','software','gear','camera','equipment','use','work with','shoot with','edit on'],
-      r: 'Cameras: Sony A7 IV, A7S III, A7C, FX3, FX6 · Canon EOS R Series · RED KOMODO 6K · Arri Alexa 35 · Blackmagic Cinema · DJI Ronin\n\nPost: Premiere Pro · DaVinci Resolve · After Effects · Avid · Photoshop · Lightroom\n\nAudio: Pro Tools · Logic Pro · Rode · Deity · Sennheiser Lavs · Zoom H-Series\n\nLive: Blackmagic ATEM Mini Pro\n\nAI: Runway · ElevenLabs · Topaz Video AI · Descript AI' },
+    { k: ['tool','software','gear','camera','equipment','shoot with','edit on','work with'],
+      r: 'Cameras: Sony A7 IV, A7S III, A7C, FX3, FX6 · Canon EOS R · RED KOMODO 6K · Arri Alexa 35 · Blackmagic Cinema · DJI Ronin\n\nPost: Premiere Pro · DaVinci Resolve · After Effects · Avid · Photoshop · Lightroom\n\nAudio: Pro Tools · Logic Pro · Rode · Deity · Sennheiser Lavs · Zoom H-Series\n\nLive: Blackmagic ATEM Mini Pro\n\nAI: Runway · ElevenLabs · Topaz Video AI · Descript AI · Captions' },
+
+    { k: ['pre-production','preproduction','prep','planning'],
+      r: 'For pre-production I work with Notion, StudioBinder, Milanote, Shot Designer, Celtx, and Google Workspace. I handle everything from concept decks and shot lists to scheduling and crew coordination.' },
 
     { k: ['hubspot','hub spot','how to hubspot'],
-      r: 'At HubSpot, Anu managed the full production pipeline for the How to HubSpot YouTube channel as a Video Production Intern — pre-production, scripting, shot lists, on-set coordination, editing in Premiere Pro, and YouTube optimization including metadata, thumbnails, and audience retention strategy.' },
+      r: 'At HubSpot I was a Video Production Intern managing the full pipeline for the How to HubSpot YouTube channel — pre-production, scripting, shot lists, on-set coordination, editing in Premiere Pro, and YouTube optimization including metadata, thumbnails, and audience retention strategy.' },
 
     { k: ['kled','kled ai'],
-      r: 'For Kled AI, Anu was Freelance Creative Producer and Director. She produced two ads — a product update announcement and a promotional brand video — leading creative development, camera operation, location scouting, teleprompter setup, and audio from pre-production through final delivery.' },
+      r: 'For Kled AI I was Freelance Creative Producer and Director. I produced two ads — a product update announcement and a promotional brand video — leading everything from creative development and location scouting to camera operation, teleprompter setup, audio, and final delivery.' },
 
     { k: ['eusexua'],
-      r: 'For EUSEXUA, Anu was a freelance collaborator shooting and editing trailers, music video content, and BTS footage. She handled camera, framing, and post-production on a fast-turnaround creative release cycle.' },
+      r: 'For EUSEXUA I was a freelance collaborator — shooting and editing trailers, music video content, and BTS footage. Fast-turnaround creative cycle, handled camera, framing, and all post-production.' },
 
     { k: ['brand innovators','leadership summit'],
-      r: 'At Brand Innovators Leadership Summit 2025 in NYC, Anu was Lead Event Videographer — capturing keynote sessions, executive panels, and backstage interviews across multi-camera Canon EOS setups, delivering platform-optimized content for YouTube and LinkedIn.' },
+      r: 'At Brand Innovators Leadership Summit 2025 in NYC, I was Lead Event Videographer — capturing keynote sessions, executive panels, and backstage interviews across multi-camera Canon EOS setups, and delivering platform-optimized content for YouTube and LinkedIn.' },
 
     { k: ['p-tal','ptal','launch film'],
-      r: 'On the P-tal USA Launch Film, Anu was Cinematographer and Assistant Director — directing lighting, camera setup, and shot composition, collaborating with the director to translate the brand\'s creative vision into a strong visual narrative.' },
+      r: 'On the P-tal USA Launch Film I was Cinematographer and Assistant Director — directing lighting, camera setup, and shot composition, working closely with the director to translate their creative vision into a strong visual narrative.' },
 
     { k: ['red dog','red dog productions','live stream','livestream'],
-      r: 'At Red Dog Productions, Anu was Live Stream Producer handling multi-camera productions using ATEM Mini Pro and Blackmagic setups at The New School. She simultaneously served as Videographer, Editor, Colorist, and Video Mixer.' },
+      r: 'At Red Dog Productions I was Live Stream Producer handling multi-camera setups using ATEM Mini Pro and Blackmagic gear at The New School — simultaneously serving as Videographer, Editor, Colorist, and Video Mixer.' },
 
     { k: ['nyfw','fashion week','new york fashion week','runway'],
-      r: 'At NYFW 2025, Anu was Press Photographer shooting editorial-style runway and backstage imagery with Sony A7 IV and 70-200mm lens — contributing to real-time social coverage and post-event brand campaigns.' },
+      r: 'At NYFW 2025 I was Press Photographer — shooting editorial-style runway and backstage imagery with Sony A7 IV and a 70-200mm lens, contributing to real-time social coverage and post-event brand campaigns.' },
 
-    { k: ['mosaic','rem','nyc ferry','favorite place','documentary','short film','narrative'],
-      r: 'On Mosaic, REM, NYC Ferry Documentary, and Favorite Place in New York, Anu was Writer, Director, Producer, and Editor with full creative control from concept through post — delivering narrative-driven short films showcased in academic and festival contexts.' },
+    { k: ['mosaic','rem','nyc ferry','favorite place','short film','narrative film'],
+      r: 'On Mosaic, REM, NYC Ferry Documentary, and Favorite Place in New York I had full creative control as Writer, Director, Producer, and Editor — from concept through post. These were showcased in academic and festival contexts.' },
 
     { k: ['visitor','night of melancholia','executive producer'],
-      r: 'On The Visitor and Night of Melancholia, Anu was Executive Producer — managing pre to post-production across 5 to 25+ crew members, overseeing budgeting, timelines, creative direction, festival submissions, and strategic promotion.' },
+      r: 'On The Visitor and Night of Melancholia I was Executive Producer — overseeing 5 to 25+ crew members, managing budgets, timelines, creative direction, festival submissions, and strategic promotion from pre to post.' },
 
-    { k: ['roots to rooftops','stories under the street','sensitive content','unraveled','threshold','cinematographer','assistant director'],
-      r: 'Across Roots to Rooftops, Stories Under the Street, Sensitive Content, Unraveled, and Threshold, Anu served as Cinematographer and Assistant Director — designing lighting, framing, and shot composition to serve each director\'s vision. She also served as Production Sound Mixer on several of these.' },
+    { k: ['roots to rooftops','sensitive content','unraveled','threshold','cinematographer','assistant director'],
+      r: 'Across Roots to Rooftops, Sensitive Content, Unraveled, and Threshold I served as Cinematographer and Assistant Director — designing lighting, framing, and shot composition. On several of these I also handled production sound as the Boom Operator and Sound Mixer.' },
 
     { k: ['building blocks','music video','gaffer','lighting'],
-      r: 'On Building Blocks of the Bridge and music video projects, Anu worked as Gaffer — designing and executing lighting setups using gels, LEDs, and cinematic lighting techniques.' },
+      r: 'On Building Blocks of the Bridge and several music video projects I worked as Gaffer — designing and executing lighting setups using gels, LEDs, and cinematic lighting techniques.' },
 
-    { k: ['pixelway','india','agency','ad agency'],
-      r: 'At Pixelway (25+ client accounts in India), Anu was Content and Campaign Lead — developing targeted ad campaigns that increased audience engagement by 30% in six months. She managed creative workflows across Facebook, Instagram, and LinkedIn with a 90%+ client retention rate.' },
+    { k: ['pixelway','agency experience','agency exp','agency background'],
+      r: 'I have 4 years of agency experience at Pixelway in India, where I worked with 25+ brands. My work covered social media content production, content strategy, handling postings and content calendars, packaging design, end-to-end branding, and client handling. I increased audience engagement by 30% in six months and maintained a 90%+ client retention rate.' },
 
-    { k: ['brand mandir','intern','digital video'],
-      r: 'At Brand Mandir, Anu was a Digital Video Intern — producing live video content with 1,000+ daily viewers, editing 15+ projects in Premiere Pro and After Effects, planning up to 4 shoots daily, and contributing to campaigns that boosted audience reach by 20%.' },
+    { k: ['brand mandir','digital video intern'],
+      r: 'At Brand Mandir I was a Digital Video Intern — producing live content attracting 1,000+ daily viewers, editing 15+ projects in Premiere Pro and After Effects, planning up to 4 shoots daily, and contributing to campaigns that boosted reach by 20%.' },
 
-    { k: ['hire','available','freelance','full time','full-time','looking for','open to','work','job'],
-      r: 'Anu is open to both full-time and freelance — actively seeking Creative Producer, Director, Producer, Video Editor, Video Production, or Account Manager roles at a studio, agency, or media company.\n\nMost interested in work spanning the full pipeline — concept, production, and post — though execution-focused roles are welcome too.' },
+    { k: ['solo','alone','by yourself','one person','handle everything'],
+      r: 'Absolutely — I can handle a full project solo. I\'ve done it many times. From writing the concept and planning the shoot to operating camera, recording audio, editing, and delivering the final cut. I\'m built for that.' },
+
+    { k: ['team','manage','crew','lead','management'],
+      r: 'I\'m very comfortable managing teams — I learned it at Pixelway where I was the connector between the creative team, clients, and management across 25+ brand accounts. I\'ve also managed crews of up to 25+ people on film productions as Executive Producer.' },
+
+    { k: ['different','stand out','unique','why you','why hire you','what makes you'],
+      r: 'Most people specialize in one thing. I do the whole thing. I can walk onto a set as the cinematographer, direct the shoot, edit the footage, grade the color, and deliver platform-ready content — without a middle person. Four years of agency experience across 25+ brands means I also understand the business side: client communication, strategy, timelines, and what actually performs. I\'m not just a creative — I\'m the person who gets it done.' },
+
+    { k: ['strongest','best at','main skill','skill','jack of all'],
+      r: 'I\'d call myself a jack of all trades — but I\'m actively mastering every one of them. Camera, direction, editing, color, audio, strategy, client management — I\'ve done all of it professionally and I keep pushing each one forward.' },
+
+    { k: ['hire','available','freelance','full time','full-time','looking for','open to','job','work','actively looking'],
+      r: 'I\'m open to both full-time and freelance. Actively looking for Creative Producer, Director, Producer, Video Editor, Video Production, or Account Manager roles — ideally at a studio, agency, or media company.\n\nI love work that spans the full pipeline, but I\'m also up for execution-focused roles.' },
+
+    { k: ['turnaround','how long','timeline','deadline','delivery'],
+      r: 'Turnaround really depends on the scope of the project — let\'s talk about it. Reach me at medigaanuragini@gmail.com and we\'ll figure out a timeline that works.' },
 
     { k: ['process','how do you work','workflow','approach','method','pipeline'],
-      r: 'Anu works across the full pipeline:\n1. Concept & pre-production (brief, shot lists, StudioBinder, Milanote)\n2. Production (camera, lighting, audio, direction)\n3. Post (edit in Premiere or Resolve, color, audio mix)\n4. Delivery & optimization (platform-specific formats, metadata, thumbnails)\n\nShe\'s comfortable leading or collaborating at any stage.' },
+      r: 'My process:\n1. We talk through the brief or I help develop the concept\n2. Pre-production — shot lists, scheduling, crew, gear\n3. Production — camera, lighting, audio, direction\n4. Post — edit, color, audio mix\n5. Delivery — platform-ready formats, metadata, thumbnails\n\nI\'m comfortable leading at any stage.' },
 
-    { k: ['on-site','remote','location','where','onsite'],
-      r: 'Anu is available on-site and remote depending on the project. Based in NYC, also open to DC-area work.' },
+    { k: ['on-site','remote','location','onsite','travel'],
+      r: 'I\'m available on-site and remote — depends on the project. Based in NYC, and also open to DC-area work.' },
 
-    { k: ['brief','concept','creative direction','idea','start a project'],
-      r: 'Anu can work from a brief or develop the concept from scratch — most clients come somewhere in between. She\'s happy to jump on a call to figure out the right starting point.' },
+    { k: ['brief','concept','idea','start a project','creative direction','from scratch'],
+      r: 'I can work from a brief or develop the concept from scratch — most clients come somewhere in between. Happy to jump on a call and figure out the right starting point together.' },
 
-    { k: ['contact','email','reach','get in touch','dm'],
+    { k: ['contact','email','reach','get in touch','dm','message'],
       r: '→ medigaanuragini@gmail.com\n→ instagram.com/anuragini22\n→ linkedin.com/in/anuragini-m-786a1b19a' },
 
     { k: ['instagram','ig'],
-      r: '@anuragini22\nhttps://www.instagram.com/anuragini22/' },
+      r: 'Find me at @anuragini22\ninstagram.com/anuragini22' },
 
     { k: ['linkedin'],
-      r: 'https://www.linkedin.com/in/anuragini-m-786a1b19a/' },
+      r: 'linkedin.com/in/anuragini-m-786a1b19a' },
 
-    { k: ['rate','price','cost','fee','budget','how much'],
-      r: 'Rates vary by scope and timeline. Email medigaanuragini@gmail.com with your project details and Anu will get back to you.' },
+    { k: ['rate','price','cost','fee','budget','how much','charge'],
+      r: 'Rates depend on scope and timeline. Drop me an email at medigaanuragini@gmail.com with your project details and I\'ll get back to you.' },
 
-    { k: ['photography','photo','shoot','event','portrait'],
-      r: 'Photography work includes NYFW 2025, Portraits, Book Launch, Latinx Storytelling Event, Holi Event, Met 2025, NYC street photography, and product photography for Vellorex and P-tal. Sony A7 IV + prime and zoom lenses.' },
+    { k: ['photography','photo','shoot','portrait','event photo'],
+      r: 'I shoot on Sony A7 IV with prime and zoom lenses. My photography work includes NYFW 2025, Portraits, Book Launch Event, Latinx Storytelling Event, Holi Event, Met 2025, NYC street photography, and product photography for Vellorex and P-tal.' },
 
-    { k: ['podcast','gen alpha','beyond the bustle','ambo','stories under'],
-      r: 'Anu has produced podcast content — find it in the Podcast section on the Works page.' },
+    { k: ['podcast','documentary','doc'],
+      r: 'I\'ve produced podcast and documentary content — check out the Podcast and Documentary Films sections on my Works page.' },
 
     { k: ['color','grading','colour','davinci','lumetri','lut'],
-      r: 'Anu grades in DaVinci Resolve Color Page and Lumetri Color, including LUT design, color correction, and full color grading workflows.' },
+      r: 'I grade in DaVinci Resolve Color Page and Lumetri Color — including LUT design, color correction, and full color grading for narrative, brand, and documentary work.' },
 
-    { k: ['audio','sound','mix','boom','lav','microphone'],
-      r: 'Audio kit: Rode Mics · Deity Mics · Sennheiser Lavs · Boom Pole · Sound Devices · Zoom H-Series. Software: Adobe Audition · Pro Tools · Logic Pro · Descript.' },
+    { k: ['audio','sound','mix','boom','lav','microphone','record'],
+      r: 'Audio kit I work with: Rode · Deity · Sennheiser Lavs · Boom Pole · Sound Devices · Zoom H-Series. Software: Audition · Pro Tools · Logic Pro · Descript.' },
 
-    { k: ['nyc','new york','based','location','dc','washington'],
-      r: 'Based in New York City. Also open to work in the DC area.' },
+    { k: ['nyc','new york','based','dc','washington','where are you'],
+      r: 'I\'m based in New York City, and open to work in the DC area too.' },
 
-    { k: ['experience','how long','years','background'],
-      r: 'Anu has worked across pre-production, production, and post on brand content, narrative films, live events, documentary, and photography — with experience at HubSpot, independent productions, agency work in India (Pixelway, Brand Mandir), and as a freelance producer/director in NYC.' },
+    { k: ['experience','how long','years'],
+      r: 'I\'ve worked across brand content, narrative films, live events, documentary, and photography — spanning HubSpot, independent productions in NYC, freelance directing and producing, and 4 years of agency work in India across 25+ brands.' },
 
     { k: ['resume','cv','reel','showreel'],
-      r: 'Her full work is on the Works page. For a resume or reel, reach out at medigaanuragini@gmail.com.' },
+      r: 'My full work is on the Works page. For a resume or reel, just email me at medigaanuragini@gmail.com.' },
 
-    { k: ['thanks','thank you','ty','appreciate','great','awesome','perfect','nice','helpful','cool'],
-      r: 'Happy to help! Feel free to ask anything else or reach Anu directly at medigaanuragini@gmail.com.' },
+    { k: ['social media','instagram content','tiktok','reels','content creation'],
+      r: 'I handle social media content end to end — strategy, scripting, shooting, editing, and publishing. I work with Meta Business Suite, TikTok Studio, Later, Sprout Social, and YouTube Studio.' },
 
-    { k: ['bye','goodbye','ciao','done','later'],
-      r: 'Thanks for stopping by! You can always reach Anu at medigaanuragini@gmail.com.' },
+    { k: ['ai','runway','elevenlabs','topaz','descript ai'],
+      r: 'I use AI tools actively in my workflow — Runway, ElevenLabs, Captions, Opia, Descript AI, Topaz Video AI, Claude, and ChatGPT. I\'m always exploring what\'s new.' },
+
+    { k: ['thanks','thank you','ty','appreciate','great','awesome','perfect','helpful','cool','nice'],
+      r: 'Of course! Feel free to ask anything else — or just email me at medigaanuragini@gmail.com.' },
+
+    { k: ['bye','goodbye','ciao','done','later','see you'],
+      r: 'Thanks for stopping by! Reach me anytime at medigaanuragini@gmail.com.' },
   ];
 
   const FALLBACKS = [
-    "I don't have that detail — try asking about Anu's work, tools, or how to hire her.",
-    "Best to email Anu directly at medigaanuragini@gmail.com for that one.",
-    "Not sure about that — want to know about her projects, process, or availability?",
+    "Hmm, I don't have that one — try asking about my work, tools, or how to get in touch.",
+    "Best bet is to email me directly at medigaanuragini@gmail.com for that.",
+    "Not sure about that one — ask me about my projects, process, or availability?",
   ];
   let fbIdx = 0;
 
