@@ -290,16 +290,16 @@
       <button id="chat-x">✕</button>
       <div id="chat-orb"></div>
       <div id="chat-title">
-        <strong>ASK ANU</strong>
-        anything about her work
+        <strong>HEY, I'M ANU</strong>
+        ask me anything
       </div>
     </div>
     <div id="chat-chips">
-      <div class="chip">What's your role?</div>
-      <div class="chip">Tools you use?</div>
-      <div class="chip">Available for hire?</div>
-      <div class="chip">Brands you've worked with?</div>
-      <div class="chip">How to get in touch?</div>
+      <div class="chip">What do you do?</div>
+      <div class="chip">What tools do you use?</div>
+      <div class="chip">Are you available for hire?</div>
+      <div class="chip">What makes you different?</div>
+      <div class="chip">How do I reach you?</div>
     </div>
     <div id="chat-log"></div>
     <div id="chat-divider"></div>
