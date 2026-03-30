@@ -181,8 +181,8 @@
 
     .cm {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 0.66rem;
-      line-height: 1.65;
+      font-size: 0.82rem;
+      line-height: 1.7;
       white-space: pre-wrap;
       max-width: 92%;
     }
