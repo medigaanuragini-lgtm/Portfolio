@@ -248,7 +248,7 @@
       outline: none;
       padding: 9px 16px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: 0.65rem;
+      font-size: 0.8rem;
       color: rgba(216,212,188,0.85);
       caret-color: #c9a84c;
       transition: border-color 0.15s;
