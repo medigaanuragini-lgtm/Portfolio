@@ -5,28 +5,93 @@
   style.textContent = `
     #chat-bubble {
       position: fixed;
-      bottom: 28px;
-      right: 22px;
+      bottom: 24px;
+      left: 22px;
       z-index: 8000;
-      padding: 7px 14px;
-      background: #080808;
-      border: 1px solid rgba(201,168,76,0.55);
-      color: #c9a84c;
-      font-family: 'VT323', monospace;
-      font-size: 1.05rem;
-      letter-spacing: 0.22em;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
       cursor: pointer;
-      transition: box-shadow 0.2s, border-color 0.2s;
       user-select: none;
+      /* lens glass */
+      background:
+        radial-gradient(circle at 38% 32%, rgba(100,150,255,0.38) 0%, transparent 42%),
+        radial-gradient(circle at 66% 62%, rgba(30,55,160,0.22) 0%, transparent 38%),
+        radial-gradient(circle at 50% 50%, #0d1528 0%, #060810 55%, #030305 100%);
+      /* lens body rings */
+      box-shadow:
+        0 0 0 5px #111111,
+        0 0 0 9px #090909,
+        0 6px 28px rgba(0,0,0,0.92),
+        inset 0 2px 4px rgba(255,255,255,0.05);
+      overflow: hidden;
+      transition: box-shadow 0.35s ease;
+    }
+    /* rotating focus ring */
+    #chat-bubble::before {
+      content: '';
+      position: absolute;
+      inset: 10px;
+      border-radius: 50%;
+      border: 1.5px solid transparent;
+      border-top-color: rgba(255,255,255,0.14);
+      border-right-color: rgba(255,255,255,0.05);
+      border-bottom-color: rgba(255,255,255,0.14);
+      border-left-color: rgba(255,255,255,0.05);
+      animation: lensRotate 4s linear infinite;
+    }
+    /* light sweep */
+    #chat-bubble::after {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: -50%;
+      width: 42%;
+      height: 140%;
+      background: linear-gradient(to right,
+        transparent,
+        rgba(255,255,255,0.52) 50%,
+        transparent
+      );
+      transform: skewX(-14deg) translateX(-20px);
+      opacity: 0;
+      pointer-events: none;
     }
     #chat-bubble:hover {
-      border-color: #c9a84c;
-      box-shadow: 0 0 14px rgba(201,168,76,0.28);
+      box-shadow:
+        0 0 0 5px #141414,
+        0 0 0 9px #0a0a0a,
+        0 6px 28px rgba(0,0,0,0.92),
+        0 0 18px rgba(201,168,76,0.18),
+        inset 0 2px 4px rgba(255,255,255,0.05);
+    }
+    #chat-bubble:hover::after {
+      animation: lensSweep 0.65s ease forwards;
+    }
+    #chat-bubble.open {
+      box-shadow:
+        0 0 0 5px #161616,
+        0 0 0 9px #0d0d0d,
+        0 0 28px rgba(201,168,76,0.45),
+        0 0 55px rgba(201,168,76,0.18),
+        inset 0 2px 4px rgba(255,255,255,0.05);
+      animation: lensPulse 2s ease-in-out infinite;
+    }
+    @keyframes lensRotate {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes lensSweep {
+      from { transform: skewX(-14deg) translateX(-20px); opacity: 0.85; }
+      to   { transform: skewX(-14deg) translateX(200px); opacity: 0; }
+    }
+    @keyframes lensPulse {
+      0%,100% { box-shadow: 0 0 0 5px #161616, 0 0 0 9px #0d0d0d, 0 0 24px rgba(201,168,76,0.4), inset 0 2px 4px rgba(255,255,255,0.05); }
+      50%      { box-shadow: 0 0 0 5px #161616, 0 0 0 9px #0d0d0d, 0 0 38px rgba(201,168,76,0.65), inset 0 2px 4px rgba(255,255,255,0.05); }
     }
     #chat-panel {
       position: fixed;
-      bottom: 72px;
-      right: 22px;
+      bottom: 100px;
+      left: 22px;
       z-index: 8000;
       width: 310px;
       max-height: 400px;
@@ -151,8 +216,8 @@
     #chat-go:hover { background: rgba(201,168,76,0.1); }
 
     @media (max-width: 600px) {
-      #chat-bubble { bottom: 76px; right: 14px; font-size: 0.95rem; padding: 6px 12px; }
-      #chat-panel  { width: calc(100vw - 28px); right: 14px; bottom: 118px; max-height: 44vh; }
+      #chat-bubble { bottom: 82px; left: 14px; width: 54px; height: 54px; }
+      #chat-panel  { width: calc(100vw - 28px); left: 14px; bottom: 148px; max-height: 44vh; }
     }
   `;
   document.head.appendChild(style);
@@ -160,7 +225,6 @@
   /* ── Build HTML ── */
   const bubble = document.createElement('div');
   bubble.id = 'chat-bubble';
-  bubble.textContent = 'ASK';
 
   const panel = document.createElement('div');
   panel.id = 'chat-panel';
@@ -312,6 +376,7 @@
   function toggleChat() {
     isOpen = !isOpen;
     panel.classList.toggle('open', isOpen);
+    bubble.classList.toggle('open', isOpen);
     if (isOpen) setTimeout(() => document.getElementById('chat-in').focus(), 230);
   }
 
