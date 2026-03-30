@@ -148,8 +148,8 @@
     }
     .chip {
       font-family: 'Share Tech Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.08em;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
       color: rgba(201,168,76,0.75);
       background: rgba(201,168,76,0.06);
       border: 1px solid rgba(201,168,76,0.18);
