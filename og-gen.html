@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    background: #0a0a0a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Georgia', serif;
+    position: relative;
+  }
+
+  /* grain */
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: 0.07;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* subtle vignette */
+  body::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%);
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .center {
+    position: relative;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 52px;
+  }
+
+  /* top rule */
+  .rule {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, rgba(201,168,76,0.5));
+  }
+
+  /* quote block */
+  .quote-wrap {
+    transform: rotate(-1.8deg);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .quote-line {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: 52px;
+    letter-spacing: 0.04em;
+    line-height: 1.18;
+    color: rgba(232,224,208,0.92);
+    font-weight: 400;
+  }
+
+  .quote-line span {
+    color: #c9a84c;
+  }
+
+  /* bottom meta */
+  .meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transform: rotate(0deg);
+  }
+
+  .name {
+    font-family: 'Courier New', monospace;
+    font-size: 15px;
+    letter-spacing: 0.38em;
+    color: rgba(201,168,76,0.75);
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .title {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    color: rgba(216,212,188,0.35);
+    text-transform: uppercase;
+  }
+
+  /* bottom rule */
+  .rule-bottom {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to top, transparent, rgba(201,168,76,0.3));
+  }
+
+  /* corner marks */
+  .corner {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    z-index: 20;
+  }
+  .corner.tl { top: 28px; left: 36px; border-top: 1px solid rgba(201,168,76,0.3); border-left: 1px solid rgba(201,168,76,0.3); }
+  .corner.tr { top: 28px; right: 36px; border-top: 1px solid rgba(201,168,76,0.3); border-right: 1px solid rgba(201,168,76,0.3); }
+  .corner.bl { bottom: 28px; left: 36px; border-bottom: 1px solid rgba(201,168,76,0.3); border-left: 1px solid rgba(201,168,76,0.3); }
+  .corner.br { bottom: 28px; right: 36px; border-bottom: 1px solid rgba(201,168,76,0.3); border-right: 1px solid rgba(201,168,76,0.3); }
+
+  /* domain */
+  .domain {
+    position: absolute;
+    bottom: 30px;
+    right: 52px;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: rgba(201,168,76,0.28);
+    z-index: 20;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+
+  <div class="center">
+    <div class="rule"></div>
+    <div class="quote-wrap">
+      <div class="quote-line">I am just a girl</div>
+      <div class="quote-line">with <span>ideas.</span></div>
+    </div>
+    <div class="meta">
+      <div class="name">Anuragini Mediga</div>
+      <div class="title">Creative Producer &nbsp;·&nbsp; Director &nbsp;·&nbsp; NYC</div>
+    </div>
+    <div class="rule-bottom"></div>
+  </div>
+
+  <div class="domain">anuraginimediga.com</div>
+</body>
+</html>
