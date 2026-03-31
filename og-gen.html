@@ -4,94 +4,68 @@
 <meta charset="UTF-8">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
     width: 1200px;
     height: 630px;
     overflow: hidden;
-    background: #0a0a0a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Georgia', serif;
     position: relative;
+    font-family: 'Courier New', monospace;
   }
 
-  /* grain */
-  body::before {
-    content: '';
+  /* background image — the uploaded photo */
+  .bg {
     position: absolute;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size: 220px 220px;
-    opacity: 0.07;
-    mix-blend-mode: overlay;
-    pointer-events: none;
-    z-index: 10;
+    background: url('Open graph.jpg') center center / cover no-repeat;
   }
 
-  /* subtle vignette */
-  body::after {
-    content: '';
+  /* dark overlay to make text legible and shift tone darker */
+  .overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%);
-    pointer-events: none;
-    z-index: 5;
+    background: rgba(10,10,10,0.38);
   }
 
-  .center {
-    position: relative;
+  /* vignette */
+  .vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(0,0,0,0.55) 100%);
+  }
+
+  /* corner brackets */
+  .corner {
+    position: absolute;
+    width: 22px;
+    height: 22px;
     z-index: 20;
+  }
+  .corner.tl { top: 30px; left: 40px; border-top: 1px solid rgba(30,30,30,0.6); border-left: 1px solid rgba(30,30,30,0.6); }
+  .corner.tr { top: 30px; right: 40px; border-top: 1px solid rgba(30,30,30,0.6); border-right: 1px solid rgba(30,30,30,0.6); }
+  .corner.bl { bottom: 30px; left: 40px; border-bottom: 1px solid rgba(30,30,30,0.6); border-left: 1px solid rgba(30,30,30,0.6); }
+  .corner.br { bottom: 30px; right: 40px; border-bottom: 1px solid rgba(30,30,30,0.6); border-right: 1px solid rgba(30,30,30,0.6); }
+
+  /* bottom bar — name + title */
+  .bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 88px;
+    background: linear-gradient(to top, rgba(8,8,8,0.88) 60%, transparent 100%);
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 52px;
-  }
-
-  /* top rule */
-  .rule {
-    width: 1px;
-    height: 60px;
-    background: linear-gradient(to bottom, transparent, rgba(201,168,76,0.5));
-  }
-
-  /* quote block */
-  .quote-wrap {
-    transform: rotate(-1.8deg);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-  }
-
-  .quote-line {
-    font-family: 'Georgia', serif;
-    font-style: italic;
-    font-size: 52px;
-    letter-spacing: 0.04em;
-    line-height: 1.18;
-    color: rgba(232,224,208,0.92);
-    font-weight: 400;
-  }
-
-  .quote-line span {
-    color: #c9a84c;
-  }
-
-  /* bottom meta */
-  .meta {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    transform: rotate(0deg);
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 50px 26px;
+    z-index: 20;
   }
 
   .name {
     font-family: 'Courier New', monospace;
-    font-size: 15px;
-    letter-spacing: 0.38em;
-    color: rgba(201,168,76,0.75);
+    font-size: 17px;
+    letter-spacing: 0.32em;
+    color: rgba(20,20,20,0.85);
     font-weight: bold;
     text-transform: uppercase;
   }
@@ -99,63 +73,40 @@
   .title {
     font-family: 'Courier New', monospace;
     font-size: 11px;
-    letter-spacing: 0.28em;
-    color: rgba(216,212,188,0.35);
+    letter-spacing: 0.22em;
+    color: rgba(20,20,20,0.55);
     text-transform: uppercase;
   }
 
-  /* bottom rule */
-  .rule-bottom {
-    width: 1px;
-    height: 40px;
-    background: linear-gradient(to top, transparent, rgba(201,168,76,0.3));
-  }
-
-  /* corner marks */
-  .corner {
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    z-index: 20;
-  }
-  .corner.tl { top: 28px; left: 36px; border-top: 1px solid rgba(201,168,76,0.3); border-left: 1px solid rgba(201,168,76,0.3); }
-  .corner.tr { top: 28px; right: 36px; border-top: 1px solid rgba(201,168,76,0.3); border-right: 1px solid rgba(201,168,76,0.3); }
-  .corner.bl { bottom: 28px; left: 36px; border-bottom: 1px solid rgba(201,168,76,0.3); border-left: 1px solid rgba(201,168,76,0.3); }
-  .corner.br { bottom: 28px; right: 36px; border-bottom: 1px solid rgba(201,168,76,0.3); border-right: 1px solid rgba(201,168,76,0.3); }
-
-  /* domain */
+  /* domain top right */
   .domain {
     position: absolute;
-    bottom: 30px;
-    right: 52px;
+    top: 34px;
+    right: 50px;
     font-family: 'Courier New', monospace;
     font-size: 10px;
     letter-spacing: 0.2em;
-    color: rgba(201,168,76,0.28);
+    color: rgba(20,20,20,0.4);
+    text-transform: lowercase;
     z-index: 20;
-    text-transform: uppercase;
   }
 </style>
 </head>
 <body>
+  <div class="bg"></div>
+  <div class="overlay"></div>
+  <div class="vignette"></div>
+
   <div class="corner tl"></div>
   <div class="corner tr"></div>
   <div class="corner bl"></div>
   <div class="corner br"></div>
 
-  <div class="center">
-    <div class="rule"></div>
-    <div class="quote-wrap">
-      <div class="quote-line">I am just a girl</div>
-      <div class="quote-line">with <span>ideas.</span></div>
-    </div>
-    <div class="meta">
-      <div class="name">Anuragini Mediga</div>
-      <div class="title">Creative Producer &nbsp;·&nbsp; Director &nbsp;·&nbsp; NYC</div>
-    </div>
-    <div class="rule-bottom"></div>
-  </div>
-
   <div class="domain">anuraginimediga.com</div>
+
+  <div class="bottom-bar">
+    <div class="name">Anuragini Mediga</div>
+    <div class="title">Creative Producer &nbsp;·&nbsp; Director &nbsp;·&nbsp; NYC</div>
+  </div>
 </body>
 </html>
