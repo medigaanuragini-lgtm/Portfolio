@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #e8e8e8;
+  --sh-out:   8px 8px 18px #c5c5c5, -8px -8px 18px #ffffff;
+  --sh-sm:    4px 4px 10px #c8c8c8, -4px -4px 10px #ffffff;
+  --sh-in:    inset 4px 4px 10px #c5c5c5, inset -4px -4px 10px #ffffff;
+  --sh-in-sm: inset 3px 3px 7px #c8c8c8, inset -3px -3px 7px #ffffff;
+  --text:     #4a4a4a;
+  --dim:      #aaa;
+  --green:    #7fbf8a;
+  --peach:    #e8a87c;
+  --blue:     #7da7c4;
+  --gold:     #c9a84c;
+  --red:      #d97a7a;
+  --r-lg:     22px;
+  --r-md:     14px;
+  --r-sm:     10px;
+  --font:     -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  --font-d:   -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+}
+
+html, body {
+  background: transparent;
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--text);
+  /* Positioned for Übersicht desktop widget — adjust top/right to reposition */
+  position: fixed;
+  top: 60px;
+  right: 16px;
+  width: 290px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── WIDGET SHELL ── */
+.w {
+  background: var(--bg);
+  border-radius: 28px;
+  box-shadow: var(--sh-out);
+  overflow: hidden;
+}
+
+/* ── HEADER ── */
+.hdr {
+  padding: 18px 18px 14px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.clock-shell {
+  width: 76px; height: 76px; flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: var(--sh-out);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.hdr-info { flex: 1; }
+.hdr-date {
+  font-family: var(--font-d);
+  font-size: 28px;
+  font-weight: 200;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.hdr-dow {
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+.hdr-badge {
+  display: inline-block;
+  margin-top: 9px;
+  background: var(--bg);
+  box-shadow: var(--sh-sm);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ── STATS STRIP ── */
+.stats {
+  display: flex;
+  gap: 8px;
+  padding: 0 18px 16px;
+}
+.stat {
+  flex: 1;
+  background: var(--bg);
+  box-shadow: var(--sh-sm);
+  border-radius: var(--r-md);
+  padding: 8px 6px;
+  text-align: center;
+}
+.stat-n {
+  font-size: 20px;
+  font-weight: 200;
+  color: var(--text);
+  font-family: var(--font-d);
+}
+.stat-l {
+  font-size: 7px;
+  color: var(--dim);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
+/* ── DIVIDER ── */
+.div { height: 1px; background: rgba(0,0,0,0.05); margin: 0 18px; }
+
+/* ── SECTION ── */
+.sec { padding: 14px 18px; }
+.sec-lbl {
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* ── TASKS ── */
+.task-list { list-style: none; }
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 0;
+  cursor: pointer;
+}
+.task-row + .task-row { border-top: 1px solid rgba(0,0,0,0.04); }
+
+.chk {
+  width: 22px; height: 22px; flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: var(--sh-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: transparent;
+  transition: all 0.2s;
+}
+.task-row.done .chk {
+  box-shadow: var(--sh-in-sm);
+  color: var(--green);
+}
+
+.task-lbl {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text);
+  transition: opacity 0.2s;
+}
+.task-row.done .task-lbl { opacity: 0.35; text-decoration: line-through; }
+
+.prio-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.ph { background: var(--red); }
+.pm { background: var(--gold); }
+.pl { background: var(--dim); }
+
+.del-x {
+  font-size: 10px; color: var(--dim);
+  cursor: pointer; opacity: 0;
+  transition: opacity 0.15s;
+  padding: 2px 4px;
+}
+.task-row:hover .del-x,
+.habit-row:hover .del-x,
+.note-c:hover .del-x,
+.rem-row:hover .del-x { opacity: 1; }
+
+/* Input box (inset neumorphic) */
+.inset-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  box-shadow: var(--sh-in-sm);
+  border-radius: var(--r-sm);
+  padding: 7px 10px;
+  margin-top: 9px;
+}
+.neu-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 11px;
+  font-family: var(--font);
+  color: var(--text);
+}
+.neu-input::placeholder { color: var(--dim); }
+.neu-btn {
+  background: var(--bg);
+  box-shadow: var(--sh-sm);
+  border: none;
+  border-radius: 7px;
+  width: 22px; height: 22px;
+  font-size: 15px; line-height: 1;
+  color: var(--dim);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: box-shadow 0.15s;
+  font-family: var(--font);
+}
+.neu-btn:active { box-shadow: var(--sh-in-sm); }
+
+/* Priority dots selector */
+.prio-sel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 0 2px;
+}
+.prio-sel-lbl { font-size: 8px; color: var(--dim); letter-spacing: 0.12em; }
+.psel {
+  width: 11px; height: 11px; border-radius: 50%;
+  cursor: pointer;
+  transition: box-shadow 0.15s, opacity 0.15s;
+  box-shadow: var(--sh-sm);
+  opacity: 0.45;
+}
+.psel.active { opacity: 1; }
+.psel-l { background: var(--dim); }
+.psel-m { background: var(--gold); }
+.psel-h { background: var(--red); }
+
+/* ── HABITS ── */
+.habit-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+}
+.habit-row + .habit-row { border-top: 1px solid rgba(0,0,0,0.04); }
+.habit-name { flex: 1; font-size: 11px; }
+.habit-streak {
+  font-size: 8px;
+  color: var(--dim);
+  background: var(--bg);
+  box-shadow: var(--sh-sm);
+  border-radius: 10px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+.h-dots { display: flex; gap: 3px; }
+.h-dot {
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--bg);
+  box-shadow: var(--sh-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.h-dot.done {
+  background: var(--green);
+  box-shadow: 2px 2px 5px rgba(127,191,138,0.45), -1px -1px 3px #fff;
+}
+.h-dot.today { box-shadow: var(--sh-in-sm); }
+.h-dot.today.done { background: var(--green); }
+
+/* ── NOTES ── */
+.note-ta {
+  width: 100%;
+  background: var(--bg);
+  box-shadow: var(--sh-in);
+  border: none;
+  border-radius: var(--r-md);
+  padding: 10px 13px;
+  font-size: 11px;
+  font-family: var(--font);
+  color: var(--text);
+  resize: none;
+  outline: none;
+  height: 58px;
+  line-height: 1.5;
+}
+.note-ta::placeholder { color: var(--dim); }
+.note-save {
+  width: 100%;
+  margin-top: 7px;
+  padding: 7px;
+  background: var(--bg);
+  box-shadow: var(--sh-sm);
+  border: none;
+  border-radius: var(--r-sm);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dim);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: box-shadow 0.15s;
+}
+.note-save:active { box-shadow: var(--sh-in-sm); }
+.note-c {
+  background: var(--bg);
+  box-shadow: var(--sh-sm);
+  border-radius: var(--r-sm);
+  padding: 9px 11px;
+  margin-top: 7px;
+  position: relative;
+}
+.note-ts { font-size: 7px; color: var(--dim); margin-bottom: 3px; letter-spacing: 0.08em; }
+.note-body { font-size: 10px; line-height: 1.5; color: var(--text); white-space: pre-wrap; padding-right: 16px; }
+.note-tag-badge {
+  display: inline-block;
+  font-size: 7px;
+  background: var(--bg);
+  box-shadow: var(--sh-sm);
+  border-radius: 10px;
+  padding: 2px 7px;
+  color: var(--dim);
+  margin-bottom: 4px;
+  letter-spacing: 0.1em;
+}
+
+/* ── REMINDERS ── */
+.rem-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 0;
+}
+.rem-row + .rem-row { border-top: 1px solid rgba(0,0,0,0.04); }
+.rem-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--peach); flex-shrink: 0; }
+.rem-text { flex: 1; font-size: 11px; }
+.rem-time {
+  font-size: 8px; color: var(--dim);
+  background: var(--bg);
+  box-shadow: var(--sh-sm);
+  border-radius: 8px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+.rem-time.past { opacity: 0.4; }
+
+.rem-inputs {
+  display: flex; gap: 6px; margin-top: 9px; align-items: center;
+}
+.rem-inputs .neu-input { font-size: 10px; }
+input[type="time"].neu-time {
+  background: transparent; border: none; outline: none;
+  font-size: 10px; font-family: var(--font); color: var(--text);
+  width: 70px;
+}
+input[type="time"]::-webkit-calendar-picker-indicator { opacity: 0.3; }
+
+/* ── EMPTY ── */
+.empty { font-size: 10px; color: var(--dim); padding: 4px 0; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+<div class="w">
+
+  <!-- Header -->
+  <div class="hdr">
+    <div class="clock-shell">
+      <svg id="clk" width="58" height="58" viewBox="0 0 58 58">
+        <circle cx="29" cy="29" r="26" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="1"/>
+        <!-- hour ticks -->
+        <g id="ticks"></g>
+        <!-- hands -->
+        <line id="hr-h" x1="29" y1="29" x2="29" y2="15"
+              stroke="#4a4a4a" stroke-width="2.5" stroke-linecap="round"/>
+        <line id="mn-h" x1="29" y1="29" x2="29" y2="8"
+              stroke="#4a4a4a" stroke-width="1.5" stroke-linecap="round"/>
+        <line id="sc-h" x1="29" y1="32" x2="29" y2="6"
+              stroke="#d97a7a" stroke-width="1" stroke-linecap="round"/>
+        <circle cx="29" cy="29" r="2.5" fill="#4a4a4a"/>
+        <circle cx="29" cy="29" r="1" fill="#d97a7a"/>
+      </svg>
+    </div>
+    <div class="hdr-info">
+      <div class="hdr-date" id="h-date">—</div>
+      <div class="hdr-dow"  id="h-dow">—</div>
+      <div class="hdr-badge">ANU · DAILY</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="stat-n" id="s-done">0</div><div class="stat-l">done</div></div>
+    <div class="stat"><div class="stat-n" id="s-left">0</div><div class="stat-l">left</div></div>
+    <div class="stat"><div class="stat-n" id="s-hab">0</div><div class="stat-l">habits</div></div>
+  </div>
+
+  <div class="div"></div>
+
+  <!-- Tasks -->
+  <div class="sec">
+    <div class="sec-lbl">Tasks</div>
+    <ul class="task-list" id="task-list"></ul>
+    <div class="inset-row">
+      <input class="neu-input" id="t-inp" placeholder="add task…" maxlength="60">
+      <button class="neu-btn" id="t-btn">+</button>
+    </div>
+    <div class="prio-sel">
+      <span class="prio-sel-lbl">PRIORITY</span>
+      <div class="psel psel-l"  id="ps-l" title="Low"></div>
+      <div class="psel psel-m active" id="ps-m" title="Mid"></div>
+      <div class="psel psel-h"  id="ps-h" title="High"></div>
+    </div>
+  </div>
+
+  <div class="div"></div>
+
+  <!-- Habits -->
+  <div class="sec">
+    <div class="sec-lbl">Habits</div>
+    <div id="habit-list"></div>
+    <div class="inset-row" style="margin-top:10px;">
+      <input class="neu-input" id="hb-inp" placeholder="new habit…" maxlength="40">
+      <button class="neu-btn" id="hb-btn">+</button>
+    </div>
+  </div>
+
+  <div class="div"></div>
+
+  <!-- Notes -->
+  <div class="sec">
+    <div class="sec-lbl">Notes</div>
+    <textarea class="note-ta" id="n-ta" placeholder="capture a thought… (⌘↵ to save)"></textarea>
+    <button class="note-save" id="n-save">SAVE NOTE</button>
+    <div id="note-list"></div>
+  </div>
+
+  <div class="div"></div>
+
+  <!-- Reminders -->
+  <div class="sec">
+    <div class="sec-lbl">Reminders</div>
+    <div id="rem-list"></div>
+    <div class="inset-row rem-inputs">
+      <input class="neu-input" id="r-txt" placeholder="set a reminder…" maxlength="50" style="flex:1;">
+      <input type="time" class="neu-time" id="r-time">
+      <button class="neu-btn" id="r-btn">+</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── STORAGE ──────────────────────────────────────────────
+const K = 'anu_w2';
+const TODAY = new Date().toISOString().slice(0,10);
+
+const load = () => { try { return JSON.parse(localStorage.getItem(K)) || {}; } catch { return {}; } };
+const save = s => localStorage.setItem(K, JSON.stringify(s));
+
+function state() {
+  const s = load();
+  if (!s.tasks)     s.tasks = [];
+  if (!s.habits)    s.habits = DEFAULT_HABITS();
+  if (!s.notes)     s.notes = [];
+  if (!s.reminders) s.reminders = [];
+  return s;
+}
+
+function DEFAULT_HABITS() {
+  return [
+    { id: uid(), name: 'Morning pages',      cd: [], streak: 0 },
+    { id: uid(), name: 'Move / stretch',     cd: [], streak: 0 },
+    { id: uid(), name: 'No phone first hour', cd: [], streak: 0 },
+    { id: uid(), name: 'Drink water',        cd: [], streak: 0 },
+  ];
+}
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+// ── CLOCK ────────────────────────────────────────────────
+(function buildTicks() {
+  const g = document.getElementById('ticks');
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * 2 * Math.PI - Math.PI / 2;
+    const r1 = 23, r2 = i % 3 === 0 ? 19 : 21;
+    const x1 = 29 + r1 * Math.cos(a), y1 = 29 + r1 * Math.sin(a);
+    const x2 = 29 + r2 * Math.cos(a), y2 = 29 + r2 * Math.sin(a);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', 'rgba(0,0,0,0.15)');
+    line.setAttribute('stroke-width', i % 3 === 0 ? '1.5' : '1');
+    line.setAttribute('stroke-linecap', 'round');
+    g.appendChild(line);
+  }
+})();
+
+function rotateLine(id, deg, cx, cy) {
+  const el = document.getElementById(id);
+  el.setAttribute('transform', `rotate(${deg} ${cx} ${cy})`);
+}
+
+function tick() {
+  const now = new Date();
+  const h = now.getHours() % 12, m = now.getMinutes(), s = now.getSeconds();
+  rotateLine('hr-h', (h * 30) + (m * 0.5),  29, 29);
+  rotateLine('mn-h', m * 6 + s * 0.1,        29, 29);
+  rotateLine('sc-h', s * 6,                   29, 29);
+
+  document.getElementById('h-date').textContent =
+    String(now.getDate()).padStart(2,'0') + '/' + String(now.getMonth()+1).padStart(2,'0');
+  document.getElementById('h-dow').textContent =
+    now.toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' }).toUpperCase();
+}
+setInterval(tick, 1000);
+tick();
+
+// ── STATS ────────────────────────────────────────────────
+function updateStats() {
+  const s = state();
+  const done = s.tasks.filter(t => t.done).length;
+  const left = s.tasks.filter(t => !t.done).length;
+  const habDone = s.habits.filter(h => (h.cd||[]).includes(TODAY)).length;
+  document.getElementById('s-done').textContent = done;
+  document.getElementById('s-left').textContent = left;
+  document.getElementById('s-hab').textContent = habDone + '/' + s.habits.length;
+}
+
+// ── TASKS ────────────────────────────────────────────────
+let selPrio = 'm';
+const prioMap = { l:'pl', m:'pm', h:'ph' };
+
+['l','m','h'].forEach(p => {
+  document.getElementById('ps-'+p).addEventListener('click', () => {
+    document.querySelectorAll('.psel').forEach(x => x.classList.remove('active'));
+    document.getElementById('ps-'+p).classList.add('active');
+    selPrio = p;
+  });
+});
+
+function renderTasks() {
+  const s = state();
+  const ul = document.getElementById('task-list');
+  ul.innerHTML = '';
+  if (!s.tasks.length) { ul.innerHTML = '<li class="empty">nothing yet</li>'; updateStats(); return; }
+  const ord = {h:0,m:1,l:2};
+  [...s.tasks].sort((a,b) => a.done!==b.done ? (a.done?1:-1) : (ord[a.p]||1)-(ord[b.p]||1))
+    .forEach(t => {
+      const li = document.createElement('li');
+      li.className = 'task-row' + (t.done?' done':'');
+      li.innerHTML = `
+        <div class="chk">${t.done?'✓':''}</div>
+        <div class="task-lbl">${esc(t.text)}</div>
+        <div class="prio-dot ${prioMap[t.p]||'pm'}"></div>
+        <div class="del-x" data-id="${t.id}">✕</div>`;
+      li.querySelector('.chk').addEventListener('click', () => toggleTask(t.id));
+      li.querySelector('.task-lbl').addEventListener('click', () => toggleTask(t.id));
+      li.querySelector('.del-x').addEventListener('click', e => { e.stopPropagation(); delTask(t.id); });
+      ul.appendChild(li);
+    });
+  updateStats();
+}
+
+function addTask() {
+  const inp = document.getElementById('t-inp');
+  const text = inp.value.trim();
+  if (!text) return;
+  const s = state();
+  s.tasks.push({ id: uid(), text, p: selPrio, done: false });
+  save(s); inp.value = ''; renderTasks();
+}
+function toggleTask(id) {
+  const s = state();
+  const t = s.tasks.find(x => x.id===id);
+  if (t) t.done = !t.done;
+  save(s); renderTasks();
+}
+function delTask(id) {
+  const s = state(); s.tasks = s.tasks.filter(x => x.id!==id); save(s); renderTasks();
+}
+
+document.getElementById('t-btn').addEventListener('click', addTask);
+document.getElementById('t-inp').addEventListener('keydown', e => { if(e.key==='Enter') addTask(); });
+
+// ── HABITS ───────────────────────────────────────────────
+function streak(h) {
+  let n = 0; const d = new Date();
+  while (true) {
+    const ds = d.toISOString().slice(0,10);
+    if ((h.cd||[]).includes(ds)) { n++; d.setDate(d.getDate()-1); } else break;
+  }
+  return n;
+}
+
+function renderHabits() {
+  const s = state();
+  const c = document.getElementById('habit-list');
+  c.innerHTML = '';
+  if (!s.habits.length) { c.innerHTML = '<div class="empty">no habits yet</div>'; updateStats(); return; }
+  s.habits.forEach(h => {
+    const str = streak(h);
+    const dotsHtml = Array.from({length:7},(_,i)=>{
+      const d = new Date(); d.setDate(d.getDate()-(6-i));
+      const ds = d.toISOString().slice(0,10);
+      const isToday = ds===TODAY;
+      const isDone = (h.cd||[]).includes(ds);
+      return `<div class="h-dot${isDone?' done':''}${isToday?' today':''}" data-id="${h.id}" data-ds="${ds}"></div>`;
+    }).join('');
+    const row = document.createElement('div');
+    row.className = 'habit-row';
+    row.innerHTML = `
+      <div class="habit-name">${esc(h.name)}</div>
+      <div class="habit-streak">${str}d</div>
+      <div class="h-dots">${dotsHtml}</div>
+      <div class="del-x" data-id="${h.id}">✕</div>`;
+    row.querySelectorAll('.h-dot').forEach(d => d.addEventListener('click', () => toggleHabit(h.id, d.dataset.ds)));
+    row.querySelector('.del-x').addEventListener('click', () => delHabit(h.id));
+    c.appendChild(row);
+  });
+  updateStats();
+}
+
+function addHabit() {
+  const inp = document.getElementById('hb-inp'); const name = inp.value.trim();
+  if (!name) return;
+  const s = state(); s.habits.push({ id:uid(), name, cd:[], streak:0 });
+  save(s); inp.value=''; renderHabits();
+}
+function toggleHabit(id, ds) {
+  const s = state(); const h = s.habits.find(x=>x.id===id);
+  if (!h) return;
+  if (!h.cd) h.cd=[];
+  const i = h.cd.indexOf(ds);
+  if (i===-1) h.cd.push(ds); else h.cd.splice(i,1);
+  save(s); renderHabits();
+}
+function delHabit(id) {
+  const s = state(); s.habits = s.habits.filter(x=>x.id!==id); save(s); renderHabits();
+}
+
+document.getElementById('hb-btn').addEventListener('click', addHabit);
+document.getElementById('hb-inp').addEventListener('keydown', e => { if(e.key==='Enter') addHabit(); });
+
+// ── NOTES ────────────────────────────────────────────────
+function renderNotes() {
+  const s = state();
+  const c = document.getElementById('note-list');
+  c.innerHTML = '';
+  if (!s.notes.length) return;
+  [...s.notes].reverse().forEach(n => {
+    const el = document.createElement('div');
+    el.className = 'note-c';
+    el.innerHTML = `
+      <div class="note-ts">${n.ts}</div>
+      <div class="note-body">${esc(n.text)}</div>
+      <div class="del-x" data-id="${n.id}" style="position:absolute;top:7px;right:9px;">✕</div>`;
+    el.querySelector('.del-x').addEventListener('click', () => delNote(n.id));
+    c.appendChild(el);
+  });
+}
+
+function saveNote() {
+  const ta = document.getElementById('n-ta'); const text = ta.value.trim();
+  if (!text) return;
+  const s = state();
+  const now = new Date();
+  s.notes.push({ id:uid(), text,
+    ts: now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) + ' · ' +
+        now.toLocaleDateString('en-US',{month:'short',day:'numeric'})
+  });
+  save(s); ta.value=''; renderNotes();
+}
+function delNote(id) {
+  const s = state(); s.notes=s.notes.filter(x=>x.id!==id); save(s); renderNotes();
+}
+
+document.getElementById('n-save').addEventListener('click', saveNote);
+document.getElementById('n-ta').addEventListener('keydown', e => { if(e.key==='Enter'&&e.metaKey) saveNote(); });
+
+// ── REMINDERS ────────────────────────────────────────────
+function renderReminders() {
+  const s = state();
+  const c = document.getElementById('rem-list');
+  c.innerHTML = '';
+  if (!s.reminders.length) { c.innerHTML = '<div class="empty">no reminders</div>'; return; }
+  const now = new Date();
+  const nowM = now.getHours()*60+now.getMinutes();
+  [...s.reminders].sort((a,b)=>a.time.localeCompare(b.time)).forEach(r => {
+    const [rh,rm] = r.time.split(':').map(Number);
+    const isPast = rh*60+rm < nowM;
+    const row = document.createElement('div');
+    row.className = 'rem-row';
+    row.innerHTML = `
+      <div class="rem-dot"></div>
+      <div class="rem-text">${esc(r.text)}</div>
+      <div class="rem-time${isPast?' past':''}">${r.time}</div>
+      <div class="del-x" data-id="${r.id}">✕</div>`;
+    row.querySelector('.del-x').addEventListener('click', () => delReminder(r.id));
+    c.appendChild(row);
+  });
+}
+
+function addReminder() {
+  const text = document.getElementById('r-txt').value.trim();
+  const time = document.getElementById('r-time').value;
+  if (!text || !time) return;
+  const s = state();
+  s.reminders.push({ id:uid(), text, time, date:TODAY, fired:false });
+  save(s);
+  document.getElementById('r-txt').value='';
+  document.getElementById('r-time').value='';
+  renderReminders();
+}
+
+function checkReminders() {
+  const s = state();
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const cur = hh+':'+mm;
+  let changed = false;
+  s.reminders.forEach(r => {
+    if (r.time===cur && r.date===TODAY && !r.fired) {
+      r.fired = true; changed = true;
+      if (Notification.permission==='granted')
+        new Notification('Reminder', { body: r.text });
+    }
+  });
+  if (changed) { save(s); renderReminders(); }
+}
+setInterval(checkReminders, 30000);
+if (Notification.permission==='default') Notification.requestPermission();
+
+document.getElementById('r-btn').addEventListener('click', addReminder);
+document.getElementById('r-txt').addEventListener('keydown', e => { if(e.key==='Enter') addReminder(); });
+
+// ── INIT ────────────────────────────────────────────────
+renderTasks(); renderHabits(); renderNotes(); renderReminders();
+</script>
+</body>
+</html>
