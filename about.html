@@ -384,14 +384,18 @@
       font-size: 11px;
     }
 
-    /* ── SKILLS — compact category blocks ── */
+    /* ── SKILLS — 2-column masonry of category blocks ── */
     .skills-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
+      column-count: 2;
+      column-gap: 26px;
       margin-top: 8px;
     }
-    .skill-block { margin: 0; padding: 0; }
+    .skill-block {
+      break-inside: avoid;
+      -webkit-column-break-inside: avoid;
+      margin: 0 0 11px;
+      padding: 0;
+    }
     .skills-category {
       font-family: 'Share Tech Mono', monospace;
       font-size: 10.5px;
