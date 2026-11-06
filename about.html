@@ -384,55 +384,53 @@
       font-size: 11px;
     }
 
-    /* ── SKILLS CHECKLIST ── */
+    /* ── SKILLS — compact category blocks ── */
     .skills-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      margin-top: 2px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-top: 8px;
     }
-    .skill-item {
+    .skill-block { margin: 0; padding: 0; }
+    .skills-category {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #c9a84c;
+      line-height: 1.4;
+      margin: 0 0 2px;
       display: flex;
       align-items: center;
       gap: 7px;
-      font-size: 13px;
-      line-height: 28px;        /* tighter — fits all items without crop */
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #ffffff;
-      margin: 0; padding: 0;
     }
-    .skill-check {
-      color: #c9a84c;
-      font-size: 14px;
+    .skills-category::before {
+      content: '';
+      width: 5px; height: 5px;
+      background: #c9a84c;
       flex-shrink: 0;
+      transform: rotate(45deg);
     }
-    .skill-label { font-size: 12.5px; }
-
-    .skills-category {
-      grid-column: 1 / -1;
-      font-size: 9.5px;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: #5a4e3e;
-      line-height: 26px;
+    .skill-list {
+      font-size: 12.5px;
+      line-height: 1.55;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #e6ddc8;
       margin: 0;
-      padding: 0;
-      border-top: 1px solid rgba(210,195,165,0.08);
+      padding-left: 12px;
     }
-    .skills-category:first-child { border-top: none; }
+    .skill-list .dot { color: rgba(201,168,76,0.55); padding: 0 4px; }
 
     .skills-closing {
-      grid-column: 1 / -1;
       font-size: 12px;
       font-style: italic;
-      color: #7a6e5e;
-      line-height: 28px;
+      color: #8a7d68;
+      line-height: 1.5;
       letter-spacing: 0.04em;
-      margin: 0;
-      padding-top: 2px;
+      margin: 6px 0 0;
+      padding-top: 7px;
       border-top: 1px solid rgba(210,195,165,0.12);
-      margin-top: 2px;
     }
 
     /* ── VHS FOOTER NAV ── */
